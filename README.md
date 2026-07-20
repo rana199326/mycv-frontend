@@ -1,27 +1,41 @@
 # MyCV - Frontend
 
-A modern Full Stack CV Management application.
+A modern CV Management web application built with React and TypeScript.
 
 ## Technologies
 
 - React
 - TypeScript
 - Vite
-- Tailwind CSS
+- Material UI
+- React Router
 - Axios
-- JWT Authentication
 
 ## Features
 
 - User authentication
-- Profile management
 - CV management
-- Skills management
-- Languages management
-- Education management
-- Experience management
-- Employer management
+- Job offers
 - Interview management
+- Responsive design
+
+## Screenshots
+
+### Login
+
+![Login](screenshots/login.png)
+
+### Home
+
+![Home](screenshots/home.png)
+
+### CV Management
+
+![CV](screenshots/cv.png)
+
+### Interview Management
+
+![Interview](screenshots/interview.png)
 
 ## Installation
 
@@ -29,11 +43,3 @@ A modern Full Stack CV Management application.
 npm install
 npm run dev
 ```
-
-## Backend
-
-This frontend communicates with the MyCV Backend API built with NestJS and Prisma.
-
-## Author
-
-Rana Hassan
