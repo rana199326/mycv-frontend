@@ -1,0 +1,2963 @@
+diff --git a/src/App.tsx b/src/App.tsx
+index 0b486e6..7199a7e 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -3,6 +3,7 @@ import { UserListPage } from "@pages/userListPage/UserListPage";
+ import { UserEditPage } from "@pages/userEditPage/UserEditPage";
+ import { LoginPage } from "@pages/login/LoginPage";
+ import Navbar from "@components/layout/NavBar";
++import Footer from "@components/layout/Footer";
+ import UIKitPage from "@pages/home/HomePage";
+ import Welcome from "@pages/welcome/WelcomePage";
+ import Profile from "@pages/profile/ProfilePage";
+@@ -12,7 +13,6 @@ import Register from "@pages/register/Register";
+ import EmailVerification from "@pages/register/EmailVerification";
+ import EmailConfirmation from "@pages/register/EmailConfirmation";
+ 
+-import Education from "@pages/education/EducationPage";
+ import EditEducation from "@pages/education/EditEducation";
+ import  EducationListPage  from "@pages/education/EducationListPage";
+ import School from "@pages/education/SchoolPage";
+@@ -27,14 +27,14 @@ import { EmployerEditPage } from "@pages/employerEditPage/EmployerEditpage";
+ import { SkillListPage } from "@pages/skillListPage/SkillListPage";
+ import { LanguageListPage } from "@pages/languageListPage/LanguageListPage";
+ import { OfferListPage } from "@pages/offerListPage/OfferListPage";
+-import EducationDetailPage from "@pages/education/EducationPage";
+-import CvListPage from "@pages/CV/CvPage";
++import Interview from "@pages/interview/InterviewPage";
++import InterviewListPage from "@pages/interview/InterviewListPage";
+ 
+ function App() {
+   return (
+     <div className="min-h-screen flex flex-col">
+       <Navbar />
+-      <div className="flex-grow flex items-center justify-center">
++      <div className="flex-1">
+         <Routes>
+           <Route path="/welcome" element={<Welcome />} />
+           <Route path="/profile" element={<Profile />} />
+@@ -61,17 +61,14 @@ function App() {
+           <Route path="/employer" element={<EmployerListPage />} />
+           <Route path="/employer/new" element={<EmployerEditPage />} />
+           <Route path="/employer/:id/edit" element={<EmployerEditPage />} />
+-          <Route path="/education/:id" element={<EducationDetailPage />} />
+ 
+-          <Route path="/edit-education" element={<EditEducation />} />
+           <Route path="/edit-education/:id" element={<EditEducation />} />
+           <Route path="/school" element={<School />} />
+           <Route path="/edit-school" element={<EditSchool />} />
+           <Route path="/edit-school/:id" element={<EditSchool />} />
+           <Route path="/skills" element={<SkillListPage />} />
+           <Route path="/languages" element={<LanguageListPage />} />
+-          <Route path="/education-list" element={<EducationListPage />} />
+-            <Route path="/education" element={<Education />} />
++          <Route path="/educationS" element={<EducationListPage />} />
+             <Route path="/edit-education" element={<EditEducation />} />
+             <Route path="/school" element={<School />} />
+             <Route path="/edit-school" element={<EditSchool />} />
+@@ -79,9 +76,11 @@ function App() {
+           <Route path="/skill" element={<SkillListPage />} />
+           <Route path="/language" element={<LanguageListPage />} />
+           <Route path="/offer" element={<OfferListPage />} />
+-          <Route path="/cvs" element={<CvListPage />} />
++          <Route path="/edit-interview" element={<Interview />} />
++          <Route path="/interview" element={<InterviewListPage />} />
+         </Routes>
+       </div>
++      <Footer />
+     </div>
+   );
+ }
+diff --git a/src/assets/images/Design-bg.png b/src/assets/images/Design-bg.png
+new file mode 100644
+index 0000000..347a598
+Binary files /dev/null and b/src/assets/images/Design-bg.png differ
+diff --git a/src/assets/images/bg-color.png b/src/assets/images/bg-color.png
+new file mode 100644
+index 0000000..a67fbb8
+Binary files /dev/null and b/src/assets/images/bg-color.png differ
+diff --git a/src/assets/images/bg-profil.png b/src/assets/images/bg-profil.png
+new file mode 100644
+index 0000000..d233cbd
+Binary files /dev/null and b/src/assets/images/bg-profil.png differ
+diff --git a/src/assets/images/my (2).png b/src/assets/images/my (2).png
+new file mode 100644
+index 0000000..a86892c
+Binary files /dev/null and b/src/assets/images/my (2).png differ
+diff --git a/src/assets/images/my (3).png b/src/assets/images/my (3).png
+new file mode 100644
+index 0000000..6832b85
+Binary files /dev/null and b/src/assets/images/my (3).png differ
+diff --git a/src/components/language/LanguageCardPage.tsx b/src/components/language/LanguageCardPage.tsx
+index acd85a5..28b3040 100644
+--- a/src/components/language/LanguageCardPage.tsx
++++ b/src/components/language/LanguageCardPage.tsx
+@@ -1,5 +1,5 @@
+ import { useState } from "react";
+-import { Star } from "lucide-react";
++import { Star, Pencil } from "lucide-react";   
+ import { LevelCategory } from "../../types/Level";
+ import { UILanguage } from "@pages/languageListPage/LanguageListViewModel";
+ 
+@@ -20,31 +20,28 @@ export const LanguageCard = ({
+   onDelete,
+   onLevelChange,
+ }: LanguageCardProps) => {
+-  // Keep local UI state in sync with parent
+   const [level, setLevel] = useState<LevelCategory>(
+     (language.level as LevelCategory) ?? "1"
+   );
+ 
+-  // Convert star click → LevelCategory "1" | "2" | "3" | "4"
+   const handleStarClick = (id: number, newLevel: number) => {
+     const converted = String(newLevel) as LevelCategory;
+-    setLevel(converted);                 // local UI update
+-    onLevelChange?.(id, converted);      // propagate to parent/API
++    setLevel(converted);
++    onLevelChange?.(id, converted);
+   };
+ 
+-  const idNum = Number(language.id); // normalize id to number once
++  const idNum = Number(language.id);
+ 
+   return (
+     <div className="bg-white rounded-lg shadow p-3 mb-2">
+-      {/* Top row: content left, actions right */}
++      {/* Top row */}
+       <div className="flex items-center justify-between gap-3">
+-        {/* Left: name + stars (allow to shrink/grow without overlapping actions) */}
++        {/* Left: name + stars */}
+         <div className="min-w-0 pr-2">
+           <h3 className="text-sm font-medium text-gray-800 truncate">
+             {language.name || "—"}
+           </h3>
+ 
+-          {/* Stars row */}
+           <div className="mt-1 inline-flex items-center gap-1 leading-none">
+             {[1, 2, 3, 4].map((star) => {
+               const filled = star <= Number(level);
+@@ -56,7 +53,7 @@ export const LanguageCard = ({
+                   aria-label={`Set level ${star}`}
+                 >
+                   <Star
+-                    className={`w-5 h-5 ${filled ? "text-yellow-400" : "text-gray-300"}`}
++                    className={`w-5 h-5 ${filled ? "text-[#d7b96d] " : "text-gray-300"}`}
+                     fill={filled ? "currentColor" : "none"}
+                   />
+                 </button>
+@@ -65,7 +62,7 @@ export const LanguageCard = ({
+           </div>
+         </div>
+ 
+-        {/* Right: actions (never overlap content) */}
++        {/* Right: actions */}
+         <div className="flex items-center gap-2 shrink-0">
+           {onDelete && (
+             <button
+@@ -80,35 +77,46 @@ export const LanguageCard = ({
+                 viewBox="0 0 24 24"
+                 stroke="currentColor"
+               >
+-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
++                <path
++                  strokeLinecap="round"
++                  strokeLinejoin="round"
++                  strokeWidth={2}
++                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
++                />
+               </svg>
+             </button>
+           )}
+ 
+-          {onView && (
++          {onEdit && (
+             <button
+-              onClick={() => onView(idNum)}
++              onClick={() => onEdit(idNum)}
+               className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+-              aria-label="View language"
+-              title="View"
++              aria-label="Edit language"
++              title="Edit"
+             >
+-              <svg className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+-              </svg>
++              <Pencil className="w-5 h-5 text-gray-600" />
+             </button>
+           )}
+ 
+-          {onEdit && (
++          {onView && (
+             <button
+-              onClick={() => onEdit(idNum)}
++              onClick={() => onView(idNum)}
+               className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+-              aria-label="Edit language"
+-              title="Edit"
++              aria-label="View language"
++              title="View"
+             >
+-              <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+-                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
++              <svg
++                className="w-5 h-5 text-black"
++                fill="none"
++                viewBox="0 0 24 24"
++                stroke="currentColor"
++              >
++                <path
++                  strokeLinecap="round"
++                  strokeLinejoin="round"
++                  strokeWidth={2}
++                  d="M9 5l7 7-7 7"
++                />
+               </svg>
+             </button>
+           )}
+diff --git a/src/components/language/LanguageEditRow.tsx b/src/components/language/LanguageEditRow.tsx
+index f11b205..a912ac5 100644
+--- a/src/components/language/LanguageEditRow.tsx
++++ b/src/components/language/LanguageEditRow.tsx
+@@ -27,7 +27,7 @@ export const LanguageEditRow = ({ language, onChange, onSave, onCancel }: Langua
+           >
+             <svg
+               className={`w-5 h-5 ${
+-                star <= Number(language.level) ? "text-yellow-400" : "text-gray-300"
++                star <= Number(language.level) ? "text-[#fdd46c]" : "text-gray-300"
+               }`}
+               fill={star <= Number(language.level) ? "currentColor" : "none"}
+               viewBox="0 0 24 24"
+@@ -47,7 +47,7 @@ export const LanguageEditRow = ({ language, onChange, onSave, onCancel }: Langua
+       <div className="flex space-x-2 mt-2 md:mt-0">
+         <button
+           onClick={() => onSave(language)}
+-          className="bg-indigo-600 text-white px-2 py-1 rounded"
++          className="bg-[#376cad] text-white px-2 py-1 rounded"
+         >
+           Enregistrer
+         </button>
+diff --git a/src/components/layout/Footer.tsx b/src/components/layout/Footer.tsx
+new file mode 100644
+index 0000000..a7f8a69
+--- /dev/null
++++ b/src/components/layout/Footer.tsx
+@@ -0,0 +1,7 @@
++export default function Footer() {
++  return (
++    <footer className="bg-[#27548a] text-white text-center py-4 text-sm">
++      © 2025 MyCV
++    </footer>
++  );
++}
+diff --git a/src/components/layout/NavBar.tsx b/src/components/layout/NavBar.tsx
+index 25ed828..662cfa5 100644
+--- a/src/components/layout/NavBar.tsx
++++ b/src/components/layout/NavBar.tsx
+@@ -91,25 +91,22 @@ const Navbar = () => {
+ 
+   // 🔹 Render
+   if (isAuthPage) {
+-    // 👉 Simple version (just logo + blue bar)
+-    return (
+-      <div className="w-full bg-[#27548a] border-b border-gray-200">
+-        <nav className="w-full px-4 sm:px-6 lg:px-8">
+-          <div className="flex items-center justify-center h-16">
+-            <img src={MycvLogo} alt="MyCV Logo" className="w-16 h-auto" />
+-          </div>
+-        </nav>
+-      </div>
+-    );
++    // 👉 Simple version (just logo)
++   return (
++    <header className="absolute top-0 left-0 w-full flex justify-center pt-6 z-50">
++      <img src={MycvLogo} alt="MyCV Logo" className="w-24 h-auto" />
++    </header>
++  );
++
+   }
+ 
+   // 👉 Full version with links + profile dropdown
+   return (
+-    <div className="w-full bg-[#27548a] border-b border-gray-200">
++<div className="fixed top-0 left-0 w-full z-20 h-17 bg-gradient-to-r from-[#27548a] via-[#376cad] to-[#87CEFA] border-b border-gray-200">
+       <nav className="w-full px-4 sm:px-6 lg:px-8">
+         <div className="flex items-center justify-between h-16">
+           {/* Logo */}
+-          <a href="/" className="flex items-center">
++          <a href="/home" className="flex items-center">
+             <img src={MycvLogo} alt="MyCV Logo" className="w-16 h-auto" />
+           </a>
+ 
+@@ -119,10 +116,10 @@ const Navbar = () => {
+               <a href="/offres" className="font-medium text-gray-100/80 hover:text-white">
+                 Offres
+               </a>
+-              <a href="/cvs" className="font-medium text-gray-100/80 hover:text-white">
++              <a href="/cv" className="font-medium text-gray-100/80 hover:text-white">
+                 CVs
+               </a>
+-              <a href="/entretiens" className="font-medium text-gray-100/80 hover:text-white">
++              <a href="/interview" className="font-medium text-gray-100/80 hover:text-white">
+                 Entretiens
+               </a>
+             </div>
+@@ -156,7 +153,7 @@ const Navbar = () => {
+                       Identity
+                     </a>
+                     <a
+-                      href="/educations"
++                      href="/educationS"
+                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                     >
+                       Formations
+diff --git a/src/components/layout/PageLayout.tsx b/src/components/layout/PageLayout.tsx
+new file mode 100644
+index 0000000..31621c5
+--- /dev/null
++++ b/src/components/layout/PageLayout.tsx
+@@ -0,0 +1,32 @@
++// src/layout/PageLayout.tsx
++import { ReactNode } from "react";
++import bgProfile from "../../assets/images/bg-profil.png"; 
++
++type PageLayoutProps = { children: ReactNode };
++
++export default function PageLayout({ children }: PageLayoutProps) {
++  return (
++    <div
++      className="
++        relative w-full min-h-full pt-16
++        bg-white md:bg-transparent       // white background on mobile
++        md:flex md:justify-center md:items-start
++      "
++    >
++     
++      <div
++        className="hidden md:block fixed inset-0 -z-10 bg-center bg-cover"
++        style={{ backgroundImage: `url(${bgProfile})` }}
++      />
++
++      <div className="
++        w-full p-3
++        md:max-w-2xl md:mx-auto
++        bg-white md:bg-white/90 md:backdrop-blur-sm
++        md:rounded-2xl md:shadow-lg md:overflow-hidden
++      ">
++        {children}
++      </div>
++    </div>
++  );
++}
+diff --git a/src/components/skill/SkillCardPage.tsx b/src/components/skill/SkillCardPage.tsx
+index b78dea4..e9d7283 100644
+--- a/src/components/skill/SkillCardPage.tsx
++++ b/src/components/skill/SkillCardPage.tsx
+@@ -1,7 +1,7 @@
+ import { SkillLevel } from "src/types/Skill";
+ import { useState } from "react";
+ import { Star } from "lucide-react";
+-import { LevelCategory } from "src/types/level";
++import { LevelCategory } from "src/types/Level";
+ 
+ type SkillCardProps = {
+   skill: SkillLevel;
+diff --git a/src/components/skill/SkillEditRow.tsx b/src/components/skill/SkillEditRow.tsx
+index d169757..18acd2f 100644
+--- a/src/components/skill/SkillEditRow.tsx
++++ b/src/components/skill/SkillEditRow.tsx
+@@ -1,4 +1,4 @@
+-import { LevelCategory } from "src/types/level";
++import { LevelCategory } from "src/types/Level";
+ 
+ type SkillEditRowProps = {
+   skill: { id: number; name: string; level: LevelCategory};
+diff --git a/src/index.css b/src/index.css
+index a461c50..82030ad 100644
+--- a/src/index.css
++++ b/src/index.css
+@@ -1 +1,11 @@
+-@import "tailwindcss";
+\ No newline at end of file
++@import "tailwindcss";
++html, body, #root {
++  height: 100%;
++}
++
++body {
++  background-size: cover;
++  background-position: center;
++  background-repeat: no-repeat;
++  background-attachment: fixed; 
++}
+diff --git a/src/pages/CV/CvListViewModel.tsx b/src/pages/CV/CvListViewModel.tsx
+deleted file mode 100644
+index 96d2d9d..0000000
+--- a/src/pages/CV/CvListViewModel.tsx
++++ /dev/null
+@@ -1,64 +0,0 @@
+-import { useEffect, useState } from "react";
+-import { cvService } from "../../services/cvService";
+-import { Cv } from "../../types/cv";
+-import { useApi } from "../../hooks/useApi";
+-
+-// --- UI type for CV list (simplified) ---
+-type UICv = {
+-  id: number;
+-  title: string;
+-  updated_at?: string;
+-};
+-
+-export const CvListViewModel = () => {
+-  const api = useApi();
+-
+-  const [cvs, setCvs] = useState<UICv[]>([]);
+-  const [isLoading, setIsLoading] = useState(false);
+-  const [error, setError] = useState<string | null>(null);
+-
+-  // Fetch all CVs
+-  const fetchCvs = async () => {
+-    try {
+-      setIsLoading(true);
+-      setError(null);
+-      const data = await cvService.getAll(api);
+-
+-      // Map data to UI format
+-      const mapped: UICv[] = data.map((cv) => ({
+-        id: cv.id,
+-        title: cv.title || `CV n°${cv.id}`,
+-        updated_at: cv.updated_at,
+-      }));
+-
+-      setCvs(mapped);
+-    } catch (err) {
+-      setError("Failed to load CVs");
+-    } finally {
+-      setIsLoading(false);
+-    }
+-  };
+-
+-  // Delete CV
+-  const deleteCv = async (id: number) => {
+-    try {
+-      await cvService.remove(api, id);
+-      setCvs((prev) => prev.filter((cv) => cv.id !== id));
+-    } catch {
+-      setError("Failed to delete CV");
+-    }
+-  };
+-
+-  // Run once on mount
+-  useEffect(() => {
+-    fetchCvs();
+-  }, []);
+-
+-  return {
+-    cvs,
+-    isLoading,
+-    error,
+-    fetchCvs,
+-    deleteCv,
+-  };
+-};
+diff --git a/src/pages/CV/CvNew.tsx b/src/pages/CV/CvNew.tsx
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/src/pages/CV/CvPage.tsx b/src/pages/CV/CvPage.tsx
+deleted file mode 100644
+index c9e89a1..0000000
+--- a/src/pages/CV/CvPage.tsx
++++ /dev/null
+@@ -1,97 +0,0 @@
+-import { FiEye, FiEdit2, FiCopy, FiTrash2 } from "react-icons/fi";
+-import { AiOutlinePlus } from "react-icons/ai";
+-import { useNavigate } from "react-router-dom";
+-import { CvListViewModel } from "../CV/CvListViewModel";
+-
+-export default function CvListPage() {
+-  const navigate = useNavigate();
+-  const { cvs, isLoading, error, deleteCv } = CvListViewModel();
+-
+-  const handleDelete = (id: number) => {
+-    if (confirm("Supprimer ce CV ?")) {
+-      deleteCv(id);
+-    }
+-  };
+-
+-  return (
+-    <div className="w-full max-w-md mx-auto pt-2 px-4 pb-4 mt-5 relative min-h-screen">
+-      {/* ha*/}
+-      <div className="bg-gray-600 text-white p-3 rounded-t m-3 flex justify-between items-center">
+-        <h2 className="text-xl font-semibold">Liste des Cvs</h2>
+-        <button
+-          onClick={() => navigate("/cvs/new")}
+-          className="bg-[#f5eedc] hover:bg-[#d9c9a1] p-2 rounded-full"
+-        >
+-          <AiOutlinePlus size={22} />
+-        </button>
+-      </div>
+-
+-      {/* Separator */}
+-      <div className="border-b border-gray-300" />
+-
+-      {/* Content */}
+-      <div className="p-4">
+-        {isLoading && (
+-          <p className="text-gray-500 text-center mt-10">Chargement...</p>
+-        )}
+-        {error && (
+-          <p className="text-red-500 text-center mt-10">{error}</p>
+-        )}
+-        {!isLoading && cvs.length === 0 && (
+-          <p className="text-gray-500 text-center mt-10">
+-            Aucun CV pour le moment.
+-          </p>
+-        )}
+-
+-        <div className="space-y-4">
+-          {cvs.map((cv) => (
+-            <div
+-              key={cv.id}
+-              className="border p-4 rounded-md shadow-sm flex justify-between items-center"
+-            >
+-              <div>
+-                <p className="font-semibold">{cv.title}</p>
+-                {cv.updated_at && (
+-                  <p className="text-xs text-gray-500 mt-1">
+-                    Maj: {new Date(cv.updated_at).toLocaleDateString()}
+-                  </p>
+-                )}
+-              </div>
+-
+-              <div className="flex items-center gap-3 text-gray-600">
+-                <button
+-                  className="p-2 rounded hover:bg-gray-100"
+-                  title="Aperçu"
+-                  onClick={() => navigate(`/cvs/${cv.id}/preview`)}
+-                >
+-                  <FiEye />
+-                </button>
+-                <button
+-                  className="p-2 rounded hover:bg-gray-100"
+-                  title="Modifier"
+-                  onClick={() => navigate(`/cvs/${cv.id}/edit`)}
+-                >
+-                  <FiEdit2 />
+-                </button>
+-                <button
+-                  className="p-2 rounded hover:bg-gray-100"
+-                  title="Dupliquer"
+-                  onClick={() => alert("À implémenter plus tard")}
+-                >
+-                  <FiCopy />
+-                </button>
+-                <button
+-                  className="p-2 rounded hover:bg-gray-100 text-red-600"
+-                  title="Supprimer"
+-                  onClick={() => handleDelete(cv.id)}
+-                >
+-                  <FiTrash2 />
+-                </button>
+-              </div>
+-            </div>
+-          ))}
+-        </div>
+-      </div>
+-    </div>
+-  );
+-}
+diff --git a/src/pages/education/EditEducation.tsx b/src/pages/education/EditEducation.tsx
+index b37cbe4..b4fac4e 100644
+--- a/src/pages/education/EditEducation.tsx
++++ b/src/pages/education/EditEducation.tsx
+@@ -1,187 +1,151 @@
+ import { useEffect, useState } from "react";
+ import { useNavigate, useParams } from "react-router-dom";
+-import { FaRegEdit, FaSave } from "react-icons/fa";
++import { FaSave } from "react-icons/fa";
++import PageLayout from "@components/layout/PageLayout";
++
++
++type School = { id: number; name: string };
+ 
+ export default function EditEducation() {
+   const navigate = useNavigate();
+   const { id } = useParams();
+ 
+-  const [schools, setSchools] = useState<any[]>([]); // List of schools
+-  const [formData, setFormData] = useState({
++  const [schools, setSchools] = useState<School[]>([]);
++  const [form, setForm] = useState({
+     name: "",
+     status: "",
+-    level: "",
+-    graduation_date: "",
+-    schoolId: "",
++    level: "",               // String
++    graduation_date: "",     // "YYYY-MM-DD"
++    schoolId: "",            // select value
+   });
++  const [saving, setSaving] = useState(false);
+ 
+-  // Fetch schools and education (if editing)
++  // load schools + education(if edit)
+   useEffect(() => {
+     const token = localStorage.getItem("token");
+ 
+-    // Fetch all schools for dropdown
+-    fetch("http://localhost:3000/school", {
+-      headers: { Authorization: `Bearer ${token}` },
+-    })
+-      .then((res) => res.json())
+-      .then((data) => setSchools(data))
+-      .catch((err) => console.error("Error loading schools:", err));
++    fetch("http://localhost:3000/school", { headers: { Authorization: `Bearer ${token}` } })
++      .then((r) => r.json()).then(setSchools).catch(() => alert("Erreur chargement écoles"));
+ 
+-    // Fetch education if editing
+     if (id) {
+-      fetch(`http://localhost:3000/education/${id}`, {
+-        headers: { Authorization: `Bearer ${token}` },
+-      })
+-        .then((res) => res.json())
+-        .then((data) => {
+-          setFormData({
+-            name: data.name,
+-            status: data.status,
+-            level: data.level,
+-            graduation_date: data.graduation_date.slice(0, 10),
+-            schoolId: data.school_id.toString(),
+-          });
+-        })
+-        .catch((err) => console.error("Error loading education:", err));
++      fetch(`http://localhost:3000/education/${id}`, { headers: { Authorization: `Bearer ${token}` } })
++        .then((r) => r.json())
++        .then((data) =>
++          setForm({
++            name: data.name ?? "",
++            status: data.status ?? "",
++            level: data.level ?? "",
++            graduation_date: data.graduation_date ? String(data.graduation_date).slice(0, 10) : "",
++            schoolId: data.school_id ? String(data.school_id) : "",
++          })
++        )
++        .catch(() => alert("Erreur chargement formation"));
+     }
+   }, [id]);
+ 
+-  // Handle form input change
+-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
++  const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+     const { name, value } = e.target;
+-    setFormData((prev) => ({
+-      ...prev,
+-      [name]: value,
+-    }));
++    setForm((p) => ({ ...p, [name]: value }));
+   };
+ 
+-  // Save (POST or PATCH)
+   const handleSave = async () => {
+-    const token = localStorage.getItem("token");
++    if (!form.name.trim()) return alert("Intitulé requis.");
++    if (!form.schoolId || form.schoolId === "add-new") return alert("Choisir une école.");
++    if (!form.graduation_date) return alert("Date d'obtention requise.");
+ 
++    const token = localStorage.getItem("token");
+     const payload = {
+-      name: formData.name,
+-      status: formData.status,
+-      level: (formData.level),
+-      graduation_date: formData.graduation_date,
+-      school_id: parseInt(formData.schoolId),
+-      profile_id: 1, // Replace later with actual profile ID
++      name: form.name.trim(),
++      status: form.status.trim(),
++      level: form.level.trim(),                 // String
++      graduation_date: form.graduation_date,    // String
++      school_id: Number(form.schoolId),         // Number
++      profile_id: 1,                          
+     };
+ 
+     try {
++      setSaving(true);
+       const res = await fetch(`http://localhost:3000/education${id ? `/${id}` : ""}`, {
+         method: id ? "PATCH" : "POST",
+-        headers: {
+-          "Content-Type": "application/json",
+-          Authorization: `Bearer ${token}`,
+-        },
++        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token ?? ""}` },
+         body: JSON.stringify(payload),
+       });
++      const text = await res.text();
++      if (!res.ok) return alert(`Erreur ${res.status}\n${text || ""}`);
+ 
+-      if (!res.ok) throw new Error("Failed to save");
+-
+-      navigate("/educations");
+-    } catch (error) {
+-      console.error("Save error:", error);
++      navigate("/education-list");
++    } catch {
+       alert("Erreur lors de l'enregistrement.");
++    } finally {
++      setSaving(false);
+     }
+   };
+ 
+   return (
+-    <div className="w-full max-w-md mx-auto pt-2 px-4 pb-4 mt-5 min-h-screen">
+-      {/* Header */}
+-      <div className="bg-gray-600 text-white p-3 rounded-t m-3 text-center">
++   <PageLayout>
++    <>
++    {/* Header */}
++         <div className="bg-[#376cad] text-white p-3 rounded-t m-3 text-center">
+         <h1 className="text-xl font-bold">Formation</h1>
+       </div>
+ 
+-      {/* School dropdown */}
++      {/* School */}
+       <div className="flex items-center gap-2 mb-2 p-4">
+         <label className="w-24 font-semibold">École :</label>
+         <select
+-            name="schoolId"
+-            value={formData.schoolId}
+-            onChange={(e) => {
+-                if (e.target.value === "add-new") {
+-                navigate("/edit-school");
+-                } else {
+-                handleChange(e);
+-                }
+-            }}
+-            className="flex-1 border rounded p-1 text-sm"
++          name="schoolId"
++          value={form.schoolId}
++          onChange={(e) => {
++            if (e.target.value === "add-new") return navigate("/edit-school");
++            onChange(e);
++          }}
++          className="flex-1 border rounded p-1 text-sm"
+         >
+-            <option value="">-- Choisir une école --</option>
+-            {schools.map((school) => (
+-                <option key={school.id} value={school.id}>
+-                {school.name} 
+-                </option>
+-            ))}
+-            <option value="add-new" className="text-blue-600 font-semibold">
+-                ➕ Ajouter une école...
+-            </option>
+-</select>
+-
++          <option value="">-- Choisir une école --</option>
++          {schools.map((s) => (
++            <option key={s.id} value={s.id.toString()}>{s.name}</option>
++          ))}
++          <option value="add-new">➕ Ajouter une école…</option>
++        </select>
+       </div>
+ 
+-      {/* Degree name */}
++      {/* Intitulé */}
+       <div className="flex items-center gap-2 mb-2 p-4">
+         <label className="w-24 font-semibold">Intitulé :</label>
+-        <input
+-          name="name"
+-          type="text"
+-          className="flex-1 border rounded p-1 text-sm"
+-          placeholder="Licence en Informatique"
+-          value={formData.name}
+-          onChange={handleChange}
+-        />
++        <input name="name" type="text" className="flex-1 border rounded p-1 text-sm"
++          placeholder="Licence en Informatique" value={form.name} onChange={onChange}/>
+       </div>
+ 
+-      {/* Status */}
++      {/* Statut */}
+       <div className="flex items-center gap-2 mb-2 p-4">
+         <label className="w-24 font-semibold">Statut :</label>
+-        <input
+-          name="status"
+-          type="text"
+-          className="flex-1 border rounded p-1 text-sm"
+-          placeholder="Diplômé"
+-          value={formData.status}
+-          onChange={handleChange}
+-        />
++        <input name="status" type="text" className="flex-1 border rounded p-1 text-sm"
++          placeholder="Diplômé / En cours" value={form.status} onChange={onChange}/>
+       </div>
+ 
+-      {/* Level */}
++      {/* Niveau (string) */}
+       <div className="flex items-center gap-2 mb-2 p-4">
+         <label className="w-24 font-semibold">Niveau :</label>
+-        <input
+-          name="level"
+-          type="text"
+-          className="flex-1 border rounded p-1 text-sm"
+-          placeholder="bachelor, master, etc."
+-          value={formData.level}
+-          onChange={handleChange}
+-        />
++        <input name="level" type="text" className="flex-1 border rounded p-1 text-sm"
++          placeholder="Licence, Master, Bac+2…" value={form.level} onChange={onChange}/>
+       </div>
+ 
+-      {/* Graduation date */}
++      {/* Date obtention */}
+       <div className="flex items-center gap-2 mb-2 p-4">
+         <label className="w-24 font-semibold">Date obtention :</label>
+-        <input
+-          name="graduation_date"
+-          type="date"
+-          className="flex-1 border rounded p-1 text-sm"
+-          value={formData.graduation_date}
+-          onChange={handleChange}
+-        />
++        <input name="graduation_date" type="date" className="flex-1 border rounded p-1 text-sm"
++          value={form.graduation_date} onChange={onChange}/>
+       </div>
+ 
+-      {/* Save button */}
+       <div className="flex justify-center">
+         <button
+           onClick={handleSave}
+-          className="text-white bg-blue-600 hover:bg-blue-700 p-3 rounded-full shadow"
++          className="text-white bg-[#376cad] hover:bg-[#1c4679] p-3 rounded-full shadow"
+         >
+           <FaSave className="text-xl" />
+         </button>
+       </div>
+-    </div>
++    </>
++    </PageLayout>
+   );
+ }
+diff --git a/src/pages/education/EditSchool.tsx b/src/pages/education/EditSchool.tsx
+index 2d2e933..55b92be 100644
+--- a/src/pages/education/EditSchool.tsx
++++ b/src/pages/education/EditSchool.tsx
+@@ -1,6 +1,8 @@
+ import { useEffect, useState } from "react";
+ import { useNavigate, useParams } from "react-router-dom";
+ import { FaSave } from "react-icons/fa";
++import PageLayout from "@components/layout/PageLayout";
++
+ 
+ export default function EditSchool() {
+   const navigate = useNavigate();
+@@ -68,9 +70,10 @@ export default function EditSchool() {
+   };
+ 
+   return (
+-    <div className="w-full max-w-md mx-auto pt-2 px-4 pb-4 mt-5 min-h-screen">
+-      {/* Page header */}
+-      <div className="bg-gray-600 text-white p-3 rounded-t m-3 text-center">
++   <PageLayout>
++    <>
++    {/* Page header */}
++      <div className="bg-[#376cad] text-white p-3 rounded-t m-3 text-center">
+         <h1 className="text-xl font-bold">École</h1>
+       </div>
+ 
+@@ -115,11 +118,12 @@ export default function EditSchool() {
+       <div className="flex justify-center">
+         <button
+           onClick={handleSave}
+-          className="text-white bg-blue-600 hover:bg-blue-700 p-3 rounded-full shadow"
++          className="text-white bg-[#376cad] hover:bg-[#1c4679] p-3 rounded-full shadow"
+         >
+           <FaSave className="text-xl" />
+         </button>
+       </div>
+-    </div>
++    </>
++    </PageLayout>
+   );
+ }
+diff --git a/src/pages/education/EducationListPage.tsx b/src/pages/education/EducationListPage.tsx
+index 04a21ad..5c9d63f 100644
+--- a/src/pages/education/EducationListPage.tsx
++++ b/src/pages/education/EducationListPage.tsx
+@@ -1,52 +1,111 @@
+-import  { useState } from 'react';
+-import { useNavigate } from 'react-router-dom';
+-import { AiOutlinePlus } from 'react-icons/ai';
+-import { FaTrashAlt } from 'react-icons/fa';
+-import { educationFormData } from '../../types/education';
+-
+-const EducationListPage = () => {
+-  const [educations, setEducations] = useState<educationFormData[]>([]);
+-  const [idCounter, setIdCounter] = useState(1);
++import { useEffect, useState } from "react";
++import { useNavigate } from "react-router-dom";
++import { AiOutlinePlus } from "react-icons/ai";
++import PageLayout from "@components/layout/PageLayout";
++import { FaPenAlt, FaTrashAlt } from "react-icons/fa";
++import { educationFormData } from "../../types/education";
++
++type EducationApiItem = educationFormData & {
++  school_id?: number;
++  school?: { id: number; name: string } | null;
++};
++
++export default function EducationListPage() {
+   const navigate = useNavigate();
++  const [educations, setEducations] = useState<EducationApiItem[]>([]);
++  const [loading, setLoading] = useState(true);
++
++  useEffect(() => {
++    const token = localStorage.getItem("token");
++    setLoading(true);
++    fetch("http://localhost:3000/education", {
++      headers: { Authorization: `Bearer ${token}` },
++    })
++      .then(async (res) => {
++        if (!res.ok) throw new Error(await res.text());
++        return res.json();
++      })
++      .then((data) => setEducations(data))
++      .catch((err) => {
++        console.error("Failed to load educations:", err);
++        alert("Erreur lors du chargement des formations.");
++      })
++      .finally(() => setLoading(false));
++  }, []);
++
++  const handleEdit = (id: number) => navigate(`/edit-education/${id}`);
++
++  const handleDelete = async (id: number) => {
++    const ok = window.confirm("Êtes-vous sûr de vouloir supprimer cette formation ?");
++    if (!ok) return;
++    const token = localStorage.getItem("token");
++    try {
++      const res = await fetch(`http://localhost:3000/education/${id}`, {
++        method: "DELETE",
++        headers: { Authorization: `Bearer ${token}` },
++      });
++      if (!res.ok) throw new Error(await res.text());
++      setEducations((prev) => prev.filter((e) => e.id !== id));
++    } catch (e) {
++      console.error(e);
++      alert("Erreur lors de la suppression.");
++    }
++  };
+ 
+-  const handleDelete = (id: number) => {
+-    setEducations(educations.filter((edu) => edu.id !== id));
++  const formatDate = (val?: string | null) => {
++    if (!val) return "";
++    return String(val).slice(0, 10);
+   };
+ 
+   return (
+-        <div className="w-full max-w-md mx-auto pt-2 px-4 pb-4 mt-5 relative min-h-screen ">  
+-      {/* Fixed dark header like in the photo */}
+-                <div className="bg-gray-600 text-white p-3 rounded-t m-3 flex justify-between items-center">
++ <PageLayout>
++  <>
++  {/* Header */}
++        <div className="bg-[#376cad] text-white p-4 rounded-t m-3 flex justify-between items-center">
+         <h2 className="text-xl font-semibold">Formations</h2>
+         <button
+-          onClick={() => navigate('/edit-education')}
+-          className="bg-[#f5eedc] hover:bg-[#d9c9a1] p-2 rounded-full"
++          onClick={() => navigate("/edit-education")}
++          className="bg-[#f5dab4] hover:bg-[#d9c9a1] p-2 rounded-full"
+         >
+           <AiOutlinePlus size={22} />
+         </button>
+       </div>
+ 
+-      {/* Separator */}
+       <div className="border-b border-gray-300" />
+ 
+-      {/* Content */}
+       <div className="p-4">
+-        {educations.length === 0 ? (
++        {loading ? (
++          <p className="text-gray-500 text-center mt-10">Chargement…</p>
++        ) : educations.length === 0 ? (
+           <p className="text-gray-500 text-center mt-10">No education added yet.</p>
+         ) : (
+           <div className="space-y-4">
+-            {educations.map((edu) => (
++            {educations.map((e) => (
+               <div
+-                key={edu.id}
+-                className="border p-4 rounded-md shadow-sm flex justify-between items-center"
++                key={e.id}
++                className="border p-4 rounded-md shadow-sm grid grid-cols-[1fr_auto_auto] gap-3 items-center"
+               >
+                 <div>
+-                  <p className="font-semibold">{edu.name}</p>
+-                  <p className="text-sm text-gray-600">{edu.level}</p>
++                  <p className="font-semibold">{e.name || "—"}</p>
++                  <p className="text-sm text-gray-600">
++                    {e.status || "—"}{e.level ? ` • ${e.level}` : ""}
++                  </p>
++                  <p className="text-xs text-gray-500">
++                    {formatDate(e.graduation_date)}
++                    {e.school?.name ? ` • ${e.school.name}` : ""}
++                  </p>
+                 </div>
+                 <button
+-                  onClick={() => handleDelete(edu.id)}
++                  onClick={() => handleEdit(e.id)}
++                  className="text-blue-500 hover:text-blue-700"
++                  title="Modifier"
++                >
++                  <FaPenAlt />
++                </button>
++                <button
++                  onClick={() => handleDelete(e.id)}
+                   className="text-red-500 hover:text-red-700"
++                  title="Supprimer"
+                 >
+                   <FaTrashAlt />
+                 </button>
+@@ -55,8 +114,7 @@ const EducationListPage = () => {
+           </div>
+         )}
+       </div>
+-    </div>
++  </>
++  </PageLayout>
+   );
+-};
+-
+-export default EducationListPage;
++}
+diff --git a/src/pages/education/EducationPage.tsx b/src/pages/education/EducationPage.tsx
+deleted file mode 100644
+index fdeb973..0000000
+--- a/src/pages/education/EducationPage.tsx
++++ /dev/null
+@@ -1,58 +0,0 @@
+-import { useEffect, useState } from "react";
+-import { useParams } from "react-router-dom";
+-
+-interface School {
+-  name: string;
+-  city: string;
+-  country: string;
+-}
+-
+-interface Education {
+-  id: number;
+-  name: string;
+-  level: string;
+-  status: string;
+-  date_obtention: string;
+-  school: School;
+-}
+-
+-export default function EducationDetailPage() {
+-  const { id } = useParams(); // Get education ID from URL
+-  const [education, setEducation] = useState<Education | null>(null);
+-
+-  // Fetch education details
+-  useEffect(() => {
+-    const token = localStorage.getItem("token");
+-    fetch(`http://localhost:3000/education/${id}`, {
+-      headers: {
+-        Authorization: `Bearer ${token}`,
+-      },
+-    })
+-      .then((res) => res.json())
+-      .then((data) => setEducation(data))
+-      .catch((err) => console.error(err));
+-  }, [id]);
+-
+-  if (!education) {
+-    return <p className="text-center mt-6">Chargement...</p>;
+-  }
+-
+-  return (
+-    <div className="max-w-lg mx-auto p-4 border rounded-lg shadow">
+-      <h2 className="text-xl font-bold text-center mb-4">Formations</h2>
+-      <div className="mb-4">
+-        <h3 className="font-semibold">École</h3>
+-        <p><strong>Nom :</strong> {education.school.name}</p>
+-        <p><strong>Ville :</strong> {education.school.city}</p>
+-        <p><strong>Pays :</strong> {education.school.country}</p>
+-      </div>
+-      <div>
+-        <h3 className="font-semibold">Formation</h3>
+-        <p><strong>Intitulé :</strong> {education.name}</p>
+-        <p><strong>Statut :</strong> {education.status}</p>
+-        <p><strong>Niveau :</strong> {education.level}</p>
+-        <p><strong>Date d'obtention :</strong> {new Date(education.date_obtention).toLocaleDateString()}</p>
+-      </div>
+-    </div>
+-  );
+-}
+diff --git a/src/pages/education/SchoolPage.tsx b/src/pages/education/SchoolPage.tsx
+index 92cba01..876ecbc 100644
+--- a/src/pages/education/SchoolPage.tsx
++++ b/src/pages/education/SchoolPage.tsx
+@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
+ import { Pencil, Trash2, Plus } from "lucide-react";
+ import { AiOutlinePlus } from "react-icons/ai";
+ import { FaPen, FaPenAlt, FaTrashAlt } from "react-icons/fa";
++import PageLayout from "@components/layout/PageLayout";
++
+ 
+ interface School {
+   name: string;
+@@ -60,9 +62,10 @@ export default function SchoolPage() {
+   };
+ 
+   return (
+-      <div className="w-full max-w-md mx-auto pt-2 px-4 pb-4 mt-5 relative min-h-screen ">
+-        {/* Header with title and add button */}
+-        <div className="bg-gray-600 text-white p-3 rounded-t m-3 flex justify-between items-center">
++    <PageLayout>
++      <>
++    {/* Header with title and add button */}
++        <div className="bg-[#376cad] text-white p-3 rounded-t m-3 flex justify-between items-center">
+           <h2 className="text-xl font-semibold">Ecoles</h2>
+           <button
+             onClick={() => navigate("/edit-school")}
+@@ -106,6 +109,7 @@ export default function SchoolPage() {
+             </div>
+           )}
+         </div>
+-      </div>
++      </>
++    </PageLayout>
+     );
+ }
+diff --git a/src/pages/employerEditPage/EmployerEditpage.tsx b/src/pages/employerEditPage/EmployerEditpage.tsx
+index 34d3488..73bc9cc 100644
+--- a/src/pages/employerEditPage/EmployerEditpage.tsx
++++ b/src/pages/employerEditPage/EmployerEditpage.tsx
+@@ -5,6 +5,7 @@ import { EmployerSize } from "../../types/Employer";
+ import { EmployerListViewModel } from "../employerListPage/EmployerListViewModel";
+ import CheckboxInput from "@components/ui/form/CheckBox";
+ import { SizeCategory } from "src/types/Size";
++import { FaSave } from "react-icons/fa";
+ 
+ export const EmployerEditPage = () => {
+   const { id } = useParams<{ id: string }>();
+@@ -74,9 +75,15 @@ export const EmployerEditPage = () => {
+   };
+ 
+   return (
+-    <div className="w-full min-h-screen px-2.5 py-5 flex flex-col items-start justify-start">
++    <div
++      className="
++        w-full min-h-screen bg-white p-3
++        md:min-h-0 md:max-w-2xl md:mx-auto md:mt-5
++        md:rounded-2xl md:shadow-lg md:bg-white/90 md:backdrop-blur-sm md:overflow-hidden
++      "
++    >
+       <div className="w-full">
+-        <div className="mb-2">
++      <div className="bg-[#376cad] text-white p-4 text-center">
+           <Header title="Employeurs" description="" />
+         </div>
+         {/* Trait séparateur descendu de 2mm */}
+@@ -201,14 +208,15 @@ export const EmployerEditPage = () => {
+               </div>
+             </div>
+           </section>
+-          <div className="flex justify-center pt-4">
+-            <button
+-              type="submit"
+-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+-            >
+-              Save
+-            </button>
+-          </div>
++      {/* Save button */}
++      <div className="flex justify-center">
++        <button
++          onClick={handleSubmit}
++          className="text-white bg-[#376cad] hover:bg-[#1c4679] p-3 rounded-full shadow"
++        >
++          <FaSave className="text-xl" />
++        </button>
++      </div>
+         </form>
+       </div>
+     </div>
+diff --git a/src/pages/experienceListPage/ExperienceListPage.tsx b/src/pages/experienceListPage/ExperienceListPage.tsx
+index a17d856..c96a846 100644
+--- a/src/pages/experienceListPage/ExperienceListPage.tsx
++++ b/src/pages/experienceListPage/ExperienceListPage.tsx
+@@ -3,6 +3,8 @@ import { Header } from "@components/layout/Header";
+ import { ExperienceCard } from "../../components/experience/ExperienceCardPage";
+ import Button from "@components/ui/globals/Button";
+ import { useNavigate } from "react-router-dom";
++import PageLayout from "@components/layout/PageLayout";
++
+ 
+ export const ExperienceListPage = () => {
+   const navigate = useNavigate();
+@@ -34,8 +36,9 @@ export const ExperienceListPage = () => {
+   }
+ 
+   return (
+-    <div className="w-full min-h-screen px-2.5 py-10 flex flex-col items-start justify-start">
+-      <div className="w-full">
++    <PageLayout>
++      <>
++    <div className="w-full">
+         <div className="flex items-center justify-between mb-2">
+           <Header title="Expériences Professionnelles" description="" />
+           <div className="ml-4 self-center">
+@@ -94,6 +97,6 @@ export const ExperienceListPage = () => {
+         onClose={() => setIsDeleteModalOpen(false)}
+         onConfirm={handleConfirmDelete}
+       /> */}
+-    </div>
++    </></PageLayout>
+   );
+ };
+diff --git a/src/pages/home/HomePage.tsx b/src/pages/home/HomePage.tsx
+index 5cc8502..8b3fda2 100644
+--- a/src/pages/home/HomePage.tsx
++++ b/src/pages/home/HomePage.tsx
+@@ -1,120 +1,43 @@
+-// components/UIKit.tsx
+-import CheckboxInput from "@components/ui/form/CheckBox";
+-import RadioInput from "@components/ui/form/Radio";
+-import Alert from "@components/ui/globals/Alert";
+-import Button from "@components/ui/globals/Button";
+-import NotificationCard from "@components/ui/globals/Card";
+-import { useState } from "react";
+-
+-// Page d'exemple
+-const UIKitPage = () => {
+-  const [emailSettings, setEmailSettings] = useState({
+-    comments: false,
+-    candidates: false,
+-    offers: false
+-  });
+-
+-  const [pushType, setPushType] = useState("everything");
+ 
++export default function HomePage() {
+   return (
+-    <div className="p-8 space-y-8">
+-      <section>
+-        <h2 className="text-xl font-bold mb-4">Buttons</h2>
+-        <div className="flex gap-4 flex-wrap">
+-          <Button text="Primary Button" />
+-          <Button text="With Icon" icon size="sm" />
+-          <Button text="Secondary" variant="secondary" />
+-          <Button text="Outline" variant="outline" />
+-          <Button text="Dark" variant="dark" />
+-        </div>
++    <div className=" bg-gray-50 flex flex-col pt-16">
++      {/* Hero Section */}
++      <section className="flex-1 flex flex-col items-center justify-center text-center p-8 bg-gradient-to-r from-[#80c5f3] to-[#30629f] text-white">
++        <h1 className="text-4xl font-bold mb-4">Bienvenue sur MyCV</h1>
++        <p className="text-lg mb-6">
++          Créez facilement votre CV, explorez les offres et suivez vos entretiens.
++        </p>
++        <button
++          onClick={() => (window.location.href = "/profile")}
++          className="bg-white text-blue-600 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition"
++        >
++          Commencer
++        </button>
+       </section>
+ 
+-      <section>
+-        <h2 className="text-xl font-bold mb-4">Alerts</h2>
+-        <div className="space-y-4">
+-          <Alert
+-            type="info"
+-            message="A new software update is available. See what's new in version 2.0.4."
+-            link="#"
+-          />
+-          <Alert
+-            type="warning"
+-            message="You have no credits left. Upgrade your account to add more credits."
+-          />
+-          <Alert type="success" message="Successfully uploaded" />
+-          <Alert
+-            type="error"
+-            message="Your session has expired. Please log in again."
+-          />
++      {/* Features Section */}
++      <section className="py-6 px-6 m-8 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
++        <a href="/cv">
++        <div className="bg-white shadow-md rounded-lg p-6 text-center">
++          <h2 className="text-xl font-bold mb-2">📝 Créer votre CV</h2>
++          <p className="text-gray-600">Un éditeur simple pour construire votre CV.</p>
+         </div>
+-      </section>
+-
+-      <section>
+-        <h2 className="text-xl font-bold mb-4">Notification Card</h2>
+-        <NotificationCard />
+-      </section>
+-
+-      <section>
+-        <div>
+-          <h3 className="text-lg font-medium">Radio Button</h3>
+-          <p className="text-sm text-gray-500">
+-            These are delivered via SMS to your mobile phone.
+-          </p>
+-          <RadioInput
+-            name="push-notifications"
+-            selected={pushType}
+-            onChange={setPushType}
+-            options={[
+-              {
+-                label: "Everything",
+-                value: "everything"
+-              },
+-              {
+-                label: "Same as email",
+-                value: "same_as_email"
+-              },
+-              {
+-                label: "No push notifications",
+-                value: "none"
+-              }
+-            ]}
+-          />
++        </a>
++        <a href="/offer">
++        <div className="bg-white shadow-md rounded-lg p-6 text-center">
++          <h2 className="text-xl font-bold mb-2">💼 Postuler aux offres</h2>
++          <p className="text-gray-600">Accédez aux offres et postulez en un clic.</p>
+         </div>
+-      </section>
+-
+-      <section>
+-        <div>
+-          <h3 className="text-lg font-medium">CheckBox</h3>
+-          <div className="mt-4 space-y-4">
+-            <CheckboxInput
+-              label="Comments"
+-              description="Get notified when someones posts a comment on a posting."
+-              checked={emailSettings.comments}
+-              onChange={(checked) =>
+-                setEmailSettings((prev) => ({ ...prev, comments: checked }))
+-              }
+-            />
+-            <CheckboxInput
+-              label="Candidates"
+-              description="Get notified when a candidate applies for a job."
+-              checked={emailSettings.candidates}
+-              onChange={(checked) =>
+-                setEmailSettings((prev) => ({ ...prev, candidates: checked }))
+-              }
+-            />
+-            <CheckboxInput
+-              label="Offers"
+-              description="Get notified when a candidate accepts or rejects an offer."
+-              checked={emailSettings.offers}
+-              onChange={(checked) =>
+-                setEmailSettings((prev) => ({ ...prev, offers: checked }))
+-              }
+-            />
+-          </div>
++        </a>
++        <a href="/interview">
++        <div className="bg-white shadow-md rounded-lg p-6 text-center">
++          <h2 className="text-xl font-bold mb-2">📅 Suivre vos entretiens</h2>
++          <p className="text-gray-600">Gardez vos rendez-vous organisés.</p>
+         </div>
++        </a>
+       </section>
++
+     </div>
+   );
+-};
+-
+-export default UIKitPage;
++}
+diff --git a/src/pages/identity/EditIdentity.tsx b/src/pages/identity/EditIdentity.tsx
+index ac04005..550721f 100644
+--- a/src/pages/identity/EditIdentity.tsx
++++ b/src/pages/identity/EditIdentity.tsx
+@@ -1,6 +1,7 @@
+ import  { useEffect, useState } from "react";
+ import { useNavigate } from "react-router-dom";
+ import { FaSave } from "react-icons/fa";
++import PageLayout from "@components/layout/PageLayout";
+ import { IdentityFormData } from "../../types/Identity";
+ import { fetchIdentityForEdit } from "../../data/identityData"; // ✅ External fetch function
+ 
+@@ -66,9 +67,10 @@ export default function EditIdentity() {
+   }
+ 
+   return (
+-    <div className="w-full max-w-md mx-auto pt-2 px-4 pb-4 mt-0">
+-      {/* 🔷 Header */}
+-      <div className="bg-gray-600 text-white p-3 rounded-t m-3 text-center">
++   <PageLayout>
++    <>
++    {/* 🔷 Header */}
++      <div className="bg-[#376cad] text-white p-3 rounded-t m-3 text-center">
+         <h1 className="text-xl font-bold">Mon profil</h1>
+       </div>
+ 
+@@ -168,16 +170,17 @@ export default function EditIdentity() {
+         />
+       </div>
+ 
+-      {/* ✅ Save Button */}
+-      <div className="flex justify-end mt-6">
++      {/* Save button */}
++      <div className="flex justify-center p-3">
+         <button
+           onClick={handleSave}
+-          className="text-white bg-blue-600 hover:bg-blue-700 p-3 rounded-full shadow"
++          className="text-white bg-[#376cad] hover:bg-[#1c4679] p-3 rounded-full shadow"
+         >
+           <FaSave className="text-xl" />
+         </button>
+       </div>
+-    </div>
++    </>
++    </PageLayout>
+   );
+ }
+ // This component allows users to edit their identity information.
+diff --git a/src/pages/identity/IdentityPage.tsx b/src/pages/identity/IdentityPage.tsx
+index 1817c0d..e35a63a 100644
+--- a/src/pages/identity/IdentityPage.tsx
++++ b/src/pages/identity/IdentityPage.tsx
+@@ -1,5 +1,7 @@
+ import  { useEffect, useState } from "react";
+ import { useNavigate } from "react-router-dom";
++import PageLayout from "@components/layout/PageLayout";
++
+ import { FaRegEdit } from "react-icons/fa";
+ import { IdentityFormData } from "../../types/Identity";
+ import { fetchIdentity } from "../../data/identityData"; // ✅ Import the fetch function
+@@ -32,9 +34,10 @@ export default function IdentityPage() {
+   */
+ 
+   return (
+-    <div className="w-full max-w-md mx-auto pt-2 px-4 pb-4 mt-0 relative">
++    <PageLayout>
++      <>      
+       {/* Header */}
+-      <div className="bg-gray-600 text-white p-3 rounded-t m-3 text-center">
++      <div className="bg-[#376cad] text-white p-3 rounded-t m-3 text-center">
+         <h1 className="text-xl font-bold">Mon profil</h1>
+       </div>
+ 
+@@ -77,14 +80,15 @@ export default function IdentityPage() {
+         </p>
+       </div>
+       {/* ✏️ Edit Button */}
+-      <div className="flex justify-center ">
++      <div className="flex justify-center p-3 ">
+         <button
+           onClick={() => navigate("/edit-identity")}
+-          className="text-black bg-white hover:bg-gray-500 p-3 rounded-full shadow"
++          className="text-white bg-[#376cad] hover:bg-[#1c4679] p-3 rounded-full shadow"
+         >
+           <FaRegEdit className="text-4xl" />
+         </button>
+       </div>
+-    </div>
++    </>
++    </PageLayout>
+   );
+ }
+diff --git a/src/pages/interview/InterviewListPage.tsx b/src/pages/interview/InterviewListPage.tsx
+new file mode 100644
+index 0000000..e114b84
+--- /dev/null
++++ b/src/pages/interview/InterviewListPage.tsx
+@@ -0,0 +1,71 @@
++import { useState } from 'react';
++import { useNavigate } from 'react-router-dom';
++import { AiOutlinePlus } from 'react-icons/ai';
++import { FaTrashAlt } from 'react-icons/fa';
++import {InterviewFormData} from '../../types/interview';
++import PageLayout from '@components/layout/PageLayout';
++
++const InterviewListPage = () => {
++  const [interviews, setInterviews] = useState<InterviewFormData[]>([]);
++  const navigate = useNavigate();
++
++  const handleDelete = (id: number) => {
++    setInterviews(interviews.filter((itw) => itw.id !== id));
++  };
++
++  return (
++       <PageLayout>
++        <>
++      {/* Header */}
++        <div className="bg-[#376cad] text-white p-4 rounded-t m-3 flex justify-between items-center">
++        <h2 className="text-xl font-semibold">Entretiens</h2>
++        <button
++          onClick={() => navigate("/edit-interview")}
++          className="bg-[#f5dab4] hover:bg-[#d9c9a1] p-2 rounded-full"
++        >
++          <AiOutlinePlus size={22} />
++        </button>
++      </div>
++
++      {/* Separator */}
++      <div className="border-b border-gray-300" />
++
++      {/* Content */}
++      <div className="p-4">
++        {interviews.length === 0 ? (
++          <p className="text-gray-500 text-center mt-10">No interviews added yet.</p>
++        ) : (
++          <div className="space-y-4">
++            {interviews.map((itw) => (
++              <div
++                key={itw.id}
++                className="border p-4 rounded-md shadow-sm flex justify-between items-center"
++              >
++                <div>
++                  <p className="font-semibold">{itw.position || "Untitled"}</p>
++                  <p className="text-sm text-gray-600">
++                    {itw.status || "No status"}
++                  </p>
++                  {itw.date_interview && (
++                    <p className="text-xs text-gray-500">
++                      {new Date(itw.date_interview).toLocaleDateString()}
++                    </p>
++                  )}
++                </div>
++                <button
++                  onClick={() => handleDelete(itw.id)}
++                  className="text-red-500 hover:text-red-700"
++                >
++                  <FaTrashAlt />
++                </button>
++              </div>
++            ))}
++          </div>
++        )}
++      </div>
++  </>
++    </PageLayout>
++  );
++};
++
++export default InterviewListPage;
+diff --git a/src/pages/interview/InterviewPage.tsx b/src/pages/interview/InterviewPage.tsx
+new file mode 100644
+index 0000000..bc824db
+--- /dev/null
++++ b/src/pages/interview/InterviewPage.tsx
+@@ -0,0 +1,441 @@
++// src/pages/InterviewPage.tsx
++import { useEffect, useState } from "react";
++import { useNavigate, useParams } from "react-router-dom";
++import { FaSave } from "react-icons/fa";
++import {
++  InterviewFormData,
++  InterviewStatus,
++  InterviewMode,
++} from "../../types/interview"; // <-- adjust path if needed
++import PageLayout from "@components/layout/PageLayout";
++
++// ---- Labels for enums (nice text) ----
++const STATUS_LABELS: Record<InterviewStatus, string> = {
++  PENDING: "En attente",
++  ACCEPTED: "Accepté",
++  REJECTED: "Refusé",
++  NO_RESPONSE: "Sans réponse",
++};
++
++const MODE_LABELS: Record<InterviewMode, string> = {
++  IN_PERSON: "Présentiel",
++  ONLINE: "En ligne",
++  TELEPHONE: "Téléphonique",
++};
++
++// ---- Process options (UI only, controls dynamic section) ----
++type ProcessOption =
++  | "Entretien planifié"
++  | "Transmettre un questionnaire QCM post-entretien"
++  | "Clôture de la candidature";
++
++// ---- Helpers (dates) ----
++// Convert ISO -> "YYYY-MM-DD" for <input type="date">
++const isoToYMD = (iso?: string | null) => (iso ? String(iso).slice(0, 10) : "");
++// Convert "YYYY-MM-DD" + "HH:mm" -> ISO "YYYY-MM-DDTHH:mm:00.000Z"
++const toISO = (d: string | null | undefined, t?: string) =>
++  d ? `${d}T${(t || "00:00")}:00.000Z` : null;
++// Convert "HH:mm" -> "HH:mm:00" for Prisma @db.Time
++const toTimeOnly = (t?: string) => (t ? `${t}:00` : null);
++
++export default function InterviewPage() {
++  const navigate = useNavigate();
++  const { id } = useParams(); // if present => edit mode
++
++  const [saving, setSaving] = useState(false);
++  const [loading, setLoading] = useState(false);
++
++  // ---- Base form strictly typed by InterviewFormData (BEGINNER-FRIENDLY) ----
++  const [form, setForm] = useState<InterviewFormData>({
++    id: 0,
++    position: "",
++    company: "",
++    status: "PENDING",
++    date_interview: null,                 // will be synced from dateYMD on save
++    is_closed: (false as unknown) as boolean, // keep compatibility with your type
++    location_of_interview: "",
++    interview_mode: "IN_PERSON",
++  });
++
++
++  const [candidatures, setCandidatures] = useState<{id:number; title:string}[]>([]);
++
++useEffect(() => {
++  const token = localStorage.getItem('token');
++  fetch('http://localhost:3000/candidature/my', {
++    headers: { Authorization: `Bearer ${token ?? ""}` },
++  })
++   .then(r => r.json())
++   .then(data => setCandidatures(data))
++   .catch(() => alert('Erreur lors du chargement des candidatures'));
++}, []);
++
++  // ---- Local UI-only fields (not in InterviewFormData) ----
++  const [dateYMD, setDateYMD] = useState<string>(""); // "YYYY-MM-DD"
++  const [timeHHmm, setTimeHHmm] = useState<string>(""); // "HH:mm"
++
++  const [process, setProcess] =
++    useState<ProcessOption>("Entretien planifié");
++
++  // QCM section (UI-only). We only send quiz_email + quiz_sent if needed.
++  const [quizEmail, setQuizEmail] = useState<string>("");
++  const [sendMethod, setSendMethod] = useState<"now" | "email">("email");
++  const [sendDate, setSendDate] = useState<string>(""); // "YYYY-MM-DD"
++  const [sendTime, setSendTime] = useState<string>(""); // "HH:mm"
++
++  // Closure section (UI-only)
++  const [closureReason, setClosureReason] = useState<
++    "ACCEPTED_OTHER_OFFER" | "PROJECT_CHANGE" | "AVAILABILITY" | "OTHER" | ""
++  >("");
++  const [closureText, setClosureText] = useState<string>("");
++
++  // Small setter for InterviewFormData
++  const setF = <K extends keyof InterviewFormData>(k: K, v: InterviewFormData[K]) =>
++    setForm((p) => ({ ...p, [k]: v }));
++
++  // ---- Load interview if editing ----
++  useEffect(() => {
++    if (!id) return; // create mode
++    const token = localStorage.getItem("token");
++
++    setLoading(true);
++    fetch(`http://localhost:3000/interview/${id}`, {
++      headers: { Authorization: `Bearer ${token}` },
++    })
++      .then(async (res) => {
++        const text = await res.text();
++        if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
++        return text ? JSON.parse(text) : {};
++      })
++      .then((data) => {
++        const filled: InterviewFormData = {
++          id: data.id,
++          position: data.position ?? "",
++          company: data.company ?? "",
++          status: (data.status ?? "PENDING") as InterviewStatus,
++          date_interview: data.date_interview ?? null, // ISO string
++          is_closed: ((!!data.is_closed) as unknown) as boolean,
++          location_of_interview: data.location_of_interview ?? "",
++          interview_mode: (data.interview_mode ?? "IN_PERSON") as InterviewMode,
++        };
++        setForm(filled);
++        setDateYMD(isoToYMD(filled.date_interview));
++        setTimeHHmm(data.hour ? String(data.hour).slice(11, 16) : ""); // if backend returns time
++      })
++      .catch((err) => {
++        console.error("Failed to load interview:", err);
++        alert("Erreur lors du chargement de l'entretien.");
++      })
++      .finally(() => setLoading(false));
++  }, [id]);
++
++  // ---- Save (POST for create, PATCH for update) ----
++  const handleSave = async () => {
++    // Minimal validation (beginner-friendly)
++    if (!form.position || !form.position.trim()) return alert("Intitulé du poste requis.");
++   
++
++    const token = localStorage.getItem("token");
++
++    // Build payload that backend expects (Prisma/DTO keys).
++    // We keep InterviewFormData fields as the source of truth.
++    const payload: any = {
++      position: form.position?.trim() ?? null,
++      company: form.company?.trim() ?? null,
++      status: form.status ?? null,                        // enum from InterviewFormData
++      is_closed: Boolean(form.is_closed),                 // convert to boolean
++      location_of_interview: form.location_of_interview?.trim() ?? null,
++      date_interview: toISO(dateYMD, timeHHmm),           // ISO date-time
++      hour: toTimeOnly(timeHHmm),                         // "HH:mm:00" for @db.Time
++      interview_mode: form.interview_mode ?? null,        // enum from InterviewFormData
++
++      // These two exist in your Prisma but NOT in InterviewFormData.
++      // We'll send them only when process = QCM.
++      quiz_email: process === "Transmettre un questionnaire QCM post-entretien"
++        ? (quizEmail || null)
++        : null,
++      quiz_sent:
++        process === "Transmettre un questionnaire QCM post-entretien"
++          ? (sendMethod === "now"
++              ? new Date().toISOString()
++              : toISO(sendDate, sendTime))
++          : null,
++
++      // Prisma requires candidature_id. Replace with a real id from your app.
++      candidature_id: 1,
++    };
++
++    try {
++      setSaving(true);
++      const res = await fetch(`http://localhost:3000/interview${id ? `/${id}` : ""}`, {
++        method: id ? "PATCH" : "POST",
++        headers: {
++          "Content-Type": "application/json",
++          Authorization: `Bearer ${token ?? ""}`,
++        },
++        body: JSON.stringify(payload),
++      });
++      const text = await res.text();
++      if (!res.ok) {
++        alert(`Erreur ${res.status}\n${text || ""}`);
++        return;
++      }
++
++      alert(id ? "Entretien modifié !" : "Entretien enregistré !");
++      navigate("/interview-list"); // change to your list route if different
++    } catch (e) {
++      console.error(e);
++      alert("Erreur lors de l'enregistrement.");
++    } finally {
++      setSaving(false);
++    }
++  };
++
++  return (
++
++ <PageLayout> 
++  <>    {/* Header */}
++      <div className="bg-[#376cad] text-white p-3 rounded-t m-3 text-center">
++        <h1 className="text-xl font-bold">
++          {id ? "Modifier l’entretien" : "Créer un entretien"}
++        </h1>
++      </div>
++
++      <div className="p-4 space-y-4 bg-white rounded-b shadow">
++        {loading ? (
++          <p className="text-gray-500 text-center">Chargement…</p>
++        ) : (
++
++          <>
++    
++            {/* ---- Position ---- */}
++            <div>
++              <label className="block text-sm font-semibold">Intitulé du poste</label>
++              <input
++                type="text"
++                className="w-full border rounded p-2 mt-1"
++                value={form.position ?? ""}
++                onChange={(e) => setF("position", e.target.value)}
++              />
++            </div>
++
++            {/* ---- Company ---- */}
++            <div>
++              <label className="block text-sm font-semibold">Entreprise</label>
++              <input
++                type="text"
++                className="w-full border rounded p-2 mt-1"
++                value={form.company ?? ""}
++                onChange={(e) => setF("company", e.target.value)}
++              />
++            </div>
++
++            {/* ---- Status (options) ---- */}
++            <div>
++              <label className="block text-sm font-semibold mb-1">État de la décision</label>
++              <div className="flex flex-col space-y-1">
++                {(Object.keys(STATUS_LABELS) as InterviewStatus[]).map((key) => (
++                  <label key={key} className="flex items-center gap-2">
++                    <input
++                      type="radio"
++                      name="status"
++                      value={key}
++                      checked={form.status === key}
++                      onChange={() => setF("status", key)}
++                    />
++                    <span>{STATUS_LABELS[key]}</span>
++                  </label>
++                ))}
++              </div>
++            </div>
++
++            {/* ---- Process selector (options) ---- */}
++            <div>
++              <label className="block text-sm font-semibold">État du Processus</label>
++              <select
++                className="w-full border rounded p-2 mt-1"
++                value={process}
++                onChange={(e) => setProcess(e.target.value as ProcessOption)}
++              >
++                <option>Entretien planifié</option>
++                <option>Transmettre un questionnaire QCM post-entretien</option>
++                <option>Clôture de la candidature</option>
++              </select>
++            </div>
++
++      {/* ---- A) Entretien planifié ---- */}
++            {process === "Entretien planifié" && (
++              <div className="border p-4 rounded bg-gray-50">
++                <h3 className="font-medium mb-3">Lieu de l’entretien</h3>
++
++                <label className="block text-sm">Lieu</label>
++                <input
++                  type="text"
++                  className="w-full border rounded p-2 mb-3"
++                  value={form.location_of_interview ?? ""}
++                  onChange={(e) => setF("location_of_interview", e.target.value)}
++                />
++
++                <div className="grid grid-cols-2 gap-3">
++                  <div>
++                    <label className="block text-sm">Date</label>
++                    <input
++                      type="date"
++                      className="w-full border rounded p-2"
++                      value={dateYMD}
++                      onChange={(e) => setDateYMD(e.target.value)}
++                    />
++                  </div>
++                  <div>
++                    <label className="block text-sm">Heure</label>
++                    <input
++                      type="time"
++                      className="w-full border rounded p-2"
++                      value={timeHHmm}
++                      onChange={(e) => setTimeHHmm(e.target.value)}
++                    />
++                  </div>
++                </div>
++
++                <label className="block text-sm mt-3">Mode de l’entretien</label>
++                <div className="flex flex-col space-y-1 mt-1">
++                  {(Object.keys(MODE_LABELS) as InterviewMode[]).map((key) => (
++                    <label key={key} className="flex items-center gap-2">
++                      <input
++                        type="radio"
++                        name="interview_mode"
++                        value={key}
++                        checked={form.interview_mode === key}
++                        onChange={() => setF("interview_mode", key)}
++                      />
++                      <span>{MODE_LABELS[key]}</span>
++                    </label>
++                  ))}
++                </div>
++              </div>
++            )}
++
++      {/* ---- B) QCM post-entretien ---- */}
++            {process === "Transmettre un questionnaire QCM post-entretien" && (
++              <div className="border p-4 rounded bg-gray-50">
++                <h3 className="font-medium mb-3">Questionnaire post-entretien</h3>
++
++                <label className="block text-sm">Email du responsable</label>
++                <input
++                  type="email"
++                  className="w-full border rounded p-2"
++                  value={quizEmail}
++                  onChange={(e) => setQuizEmail(e.target.value)}
++                />
++
++                <label className="block text-sm font-semibold mt-3">Méthode d’envoi</label>
++                <div className="flex items-center gap-4 mt-1">
++                  <label className="flex items-center gap-2">
++                    <input
++                      type="radio"
++                      name="sendMethod"
++                      checked={sendMethod === "now"}
++                      onChange={() => setSendMethod("now")}
++                    />
++                    <span>Immédiatement après l’entretien</span>
++                  </label>
++                  <label className="flex items-center gap-2">
++                    <input
++                      type="radio"
++                      name="sendMethod"
++                      checked={sendMethod === "email"}
++                      onChange={() => setSendMethod("email")}
++                    />
++                    <span>Par email à une date/heure spécifiques</span>
++                  </label>
++                </div>
++
++                {sendMethod === "email" && (
++                  <div className="grid grid-cols-2 gap-3 mt-3">
++                    <div>
++                      <label className="block text-sm">Date d’envoi</label>
++                      <input
++                        type="date"
++                        className="w-full border rounded p-2"
++                        value={sendDate}
++                        onChange={(e) => setSendDate(e.target.value)}
++                      />
++                    </div>
++                    <div>
++                      <label className="block text-sm">Heure</label>
++                      <input
++                        type="time"
++                        className="w-full border rounded p-2"
++                        value={sendTime}
++                        onChange={(e) => setSendTime(e.target.value)}
++                      />
++                    </div>
++                  </div>
++                )}
++              </div>
++            )}
++
++      {/* ---- C) Clôture de la candidature ---- */}
++            {process === "Clôture de la candidature" && (
++              <div className="border p-4 rounded bg-gray-50">
++                <h3 className="font-medium mb-3">Motif de la clôture</h3>
++
++                <div className="flex flex-col space-y-1">
++                  {[
++                    { val: "ACCEPTED_OTHER_OFFER", label: "J’ai accepté une autre offre" },
++                    { val: "PROJECT_CHANGE", label: "Changement de projet professionnel" },
++                    { val: "AVAILABILITY", label: "Problèmes de disponibilité" },
++                    { val: "OTHER", label: "Autre (champ de texte libre)" },
++                  ].map(({ val, label }) => (
++                    <label key={val} className="flex items-center gap-2">
++                      <input
++                        type="radio"
++                        name="closure"
++                        checked={closureReason === (val as any)}
++                        onChange={() => setClosureReason(val as any)}
++                      />
++                      <span>{label}</span>
++                    </label>
++                  ))}
++                </div>
++
++                {closureReason === "OTHER" && (
++                  <textarea
++                    className="w-full border rounded p-2 mt-2"
++                    rows={3}
++                    placeholder="Précisez le motif…"
++                    value={closureText}
++                    onChange={(e) => setClosureText(e.target.value)}
++                  />
++                )}
++
++                <div className="flex items-center gap-2 mt-3">
++                  <input
++                    id="is_closed"
++                    type="checkbox"
++                    checked={Boolean(form.is_closed)}
++                    onChange={(e) =>
++                      setF("is_closed", (e.target.checked as unknown) as boolean)
++                    }
++                  />
++                  <label htmlFor="is_closed" className="text-sm">Clôturer l’entretien</label>
++                </div>
++              </div>
++            )}
++
++            {/* ---- Save ---- */}
++            <div className="flex justify-center">
++              <button
++          onClick={handleSave}
++          className="text-white bg-[#376cad] hover:bg-[#1c4679] p-3 rounded-full shadow"
++        >
++          <FaSave className="text-xl" />
++        </button>
++            </div>
++          </>
++        )}
++      </div>
++    </>
++    </PageLayout>
++  );
++}
+diff --git a/src/pages/languageListPage/LanguageListPage.tsx b/src/pages/languageListPage/LanguageListPage.tsx
+index 1ba2666..4786172 100644
+--- a/src/pages/languageListPage/LanguageListPage.tsx
++++ b/src/pages/languageListPage/LanguageListPage.tsx
+@@ -1,9 +1,9 @@
+ import { useState } from "react";
+-import { Header } from "@components/layout/Header";
+-import Button from "@components/ui/globals/Button";
+ import { LanguageListViewModel, UiLangLevel } from "../languageListPage/LanguageListViewModel";
+ import { LanguageCard } from "../../components/language/LanguageCardPage";     // same API as SkillCard
+ import { LanguageEditRow } from "../../components/language/LanguageEditRow";   // same API as SkillEditRow
++import PageLayout from "@components/layout/PageLayout";
++import { AiOutlinePlus } from "react-icons/ai";
+ 
+ export const LanguageListPage = () => {
+   const {
+@@ -25,19 +25,20 @@ export const LanguageListPage = () => {
+   if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
+ 
+   return (
+-    <div className="w-full min-h-screen px-2.5 py-10">
+-      <div className="w-full">
+-        <div className="flex items-center justify-between mb-2">
+-          <Header title="Langues" description="" />
++     <PageLayout>
++        <>
++          <div className="w-full">
++        <div className="bg-[#376cad] text-white p-3 rounded-t m-3 flex justify-between items-center">
++        <h2 className="text-xl font-semibold">Langues</h2>
++
+           {/* Add button: opens inline row for a NEW language */}
+-          <div className="ml-4">
+-            <Button
++          <div className="ml-4 self-center">
++            <button
+               onClick={() => setEditingLanguage({ id: -1, name: "", level: "1" })}
+-              variant="beige"
+-              icon={true}
+-              size="lg"
+-              borderRadius="full"
+-            />
++             className="bg-[#f5dab4] hover:bg-[#d9c9a1] p-2 rounded-full">
++                            <AiOutlinePlus size={22} />
++              </button>
++              
+           </div>
+         </div>
+ 
+@@ -48,25 +49,13 @@ export const LanguageListPage = () => {
+           {languages.map((l, index) => (
+             <div key={l.id} className="relative">
+               <LanguageCard
+-                language={l}
+-                index={index}
+-                onEdit={(id) =>setEditingLanguage({ id, name: l.name, level: l.level })}
+-                onDelete={(id) => {
+-                  if (window.confirm("Delete this language?")) deleteLanguageNow(id);
+-                }}
+-                onLevelChange={(id, newLevel) => {
+-                  const updated = { ...l, level: newLevel };
+-                  handleUpdateLanguage(id, updated);
+-                }}
+-              />
+-              {/* Edit icon in card */}
+-              <button
+-                aria-label="Edit language"
+-                className="absolute top-2 right-2 rounded-full p-2 shadow bg-white hover:bg-gray-50"
+-                onClick={() => setEditingLanguage({ id: l.id, name: l.name, level: l.level })}
+-              >
+-                ✏️
+-              </button>
++  language={l}
++  index={index}
++  onEdit={(id) => setEditingLanguage({ id, name: l.name, level: l.level })}
++  onDelete={(id) => { if (window.confirm("Delete this language?")) deleteLanguageNow(id); }}
++  onLevelChange={(id, newLevel) => handleUpdateLanguage(id, { ...l, level: newLevel })}
++/>
++
+             </div>
+           ))}
+         </div>
+@@ -75,36 +64,17 @@ export const LanguageListPage = () => {
+         <div className="hidden md:block space-y-3">
+           {languages.map((l, index) => (
+             <div key={l.id} className="flex items-center gap-3">
+-              <div className="flex-1">
+-                <LanguageCard
+-                  language={l}
+-                  index={index}
+-                  onDelete={(id) => {
+-                    if (window.confirm("Delete this language?")) deleteLanguageNow(id);
+-                  }}
+-                  onLevelChange={(id, level) => {
+-                    handleUpdateLanguage(id, { ...l, level });
+-                  }}
+-                />
+-              </div>
+-              <div className="flex items-center gap-2">
+-                <button
+-                  className="px-3 py-1 rounded-md border hover:bg-gray-50"
+-                  onClick={() => setEditingLanguage({ id: l.id, name: l.name, level: l.level })}
+-                  title="Edit"
+-                >
+-                  Edit
+-                </button>
+-                <button
+-                  className="px-3 py-1 rounded-md border hover:bg-red-50 text-red-600 border-red-300"
+-                  onClick={() => {
+-                    if (window.confirm("Delete this language?")) deleteLanguageNow(l.id);
+-                  }}
+-                  title="Delete"
+-                >
+-                  Delete
+-                </button>
+-              </div>
++             <div className="flex-1">
++  <LanguageCard
++    language={l}
++    index={index}
++    onEdit={(id) => setEditingLanguage({ id, name: l.name, level: l.level })}
++    onDelete={(id) => { if (window.confirm("Delete this language?")) deleteLanguageNow(id); }}
++    onLevelChange={(id, level) => handleUpdateLanguage(id, { ...l, level })}
++/>
++</div>
++
++             
+             </div>
+           ))}
+         </div>
+@@ -133,6 +103,7 @@ export const LanguageListPage = () => {
+           />
+         )}
+       </div>
+-    </div>
++    </>
++      </PageLayout>
+   );
+ };
+diff --git a/src/pages/login/LoginPage.tsx b/src/pages/login/LoginPage.tsx
+index d4be2dd..0ace481 100644
+--- a/src/pages/login/LoginPage.tsx
++++ b/src/pages/login/LoginPage.tsx
+@@ -1,4 +1,5 @@
+ import { useState, useEffect } from "react";
++import bg from "@assets/images/Design-bg.png";
+ import { useParams, useNavigate } from "react-router-dom";
+ import { ProfileFormData } from "../../types/Profile";
+ import Button from "@components/ui/globals/Button";
+@@ -7,6 +8,7 @@ import { authService } from "@services/authService";
+ import { useAuthStore } from "../../store/authStore";
+ 
+ 
++
+ export const LoginPage = () => {
+   const navigate = useNavigate();
+ 
+@@ -58,78 +60,74 @@ useAuthStore.getState().setTokens(access_token, refresh_token);
+ 
+ 
+   return (
+-    <div className="pt-24 pb-16 flex flex-col items-center px-4 min-h-screen">
+-      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
+-        <h1 className="font-bold text-2xl mb-4">
+-          J'ai déjà un espace, je me connecte
+-        </h1>
+-
+-        {isAlert && (
+-          <div className="p-4 mb-4 text-sm text-red-500 rounded-xl bg-red-50 font-normal" role="alert">
+-            <span className="font-semibold mr-2">Attention</span>
+-            {isAlert}
+-          </div>
+-        )}
+-
+-        <form onSubmit={handleLogin} className="space-y-6">
+-          {/* Email field */}
+-          <div>
+-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+-            <input
+-              type="email"
+-              name="email"
+-              value={formLoginData.email}
+-              onChange={(e) =>
+-                setFormLoginData({ ...formLoginData, email: e.target.value })
+-              }
+-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2"
+-            />
+-          </div>
+-
+-          {/* Password field */}
+-          <div>
+-            <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+-            <input
+-              type="password"
+-              name="password"
+-              value={formLoginData.password}
+-              onChange={(e) =>
+-                setFormLoginData({ ...formLoginData, password: e.target.value })
+-              }
+-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2"
+-            />
+-            <div className="mt-4">
+-              <CheckboxInput
+-                label="passwordSaved"
+-                description="Mémoriser le mot de passe"
+-                checked={profilSettings.saved}
+-                onChange={(checked: any) =>
+-                  setProfilSettings((prev) => ({ ...prev, saved: checked }))
+-                }
++         <div
++      className="w-full min-h-screen bg-center bg-cover"
++      style={ window.innerWidth >= 768 ? { backgroundImage: `url(${bg})` } : undefined }
++    >
++    <div className="pt-32 pb-8 flex flex-col items-center px-4">
++        <div className="w-full max-w-md bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6">
++          <h1 className="font-bold text-2xl mb-4">
++            J'ai déjà un espace, je me connecte
++          </h1>
++
++          {isAlert && (
++            <div className="p-4 mb-4 text-sm text-red-500 rounded-xl bg-red-50 font-normal" role="alert">
++              <span className="font-semibold mr-2">Attention</span>
++              {isAlert}
++            </div>
++          )}
++
++          <form onSubmit={handleLogin} className="space-y-6">
++            {/* Email */}
++            <div>
++              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
++              <input
++                type="email"
++                value={formLoginData.email}
++                onChange={(e) => setFormLoginData({ ...formLoginData, email: e.target.value })}
++                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2"
+               />
+             </div>
+-          </div>
+-
+-          {/* Login button */}
+-          <div className="flex flex-col items-center mt-8 space-y-2">
+-            <Button text="Se connecter" variant="beige"  onClick={handleLogin}/>
+-            <a
+-              href="#"
+-              className="text-sm font-medium text-gray-700 hover:underline"
+-            >
+-              Mot de passe oublié
+-            </a>
+-          </div>
+-        </form>
+-      </div>
+ 
+-      {/* Register redirect */}
+-      <div className="w-full max-w-md flex flex-col items-center mt-24 space-y-2">
+-        <p className="text-sm font-medium text-gray-700">
+-          Je n'ai pas de compte, je m'inscris
+-        </p>
+-        <Button text="S'inscrire" variant="beige" onClick={() => navigate('/register')} />
++            {/* Password */}
++            <div>
++              <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
++              <input
++                type="password"
++                value={formLoginData.password}
++                onChange={(e) => setFormLoginData({ ...formLoginData, password: e.target.value })}
++                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2"
++              />
++              <div className="mt-4">
++                <CheckboxInput
++                  label="passwordSaved"
++                  description="Mémoriser le mot de passe"
++                  checked={profilSettings.saved}
++                  onChange={(checked: boolean) =>
++                    setProfilSettings((prev) => ({ ...prev, saved: checked }))
++                  }
++                />
++              </div>
++            </div>
++
++            {/* Login button */}
++            <div className="flex flex-col items-center mt-8 space-y-2">
++              <Button text="Se connecter" variant="beige" onClick={handleLogin} />
++              <a href="#" className="text-sm font-medium text-gray-700 hover:underline">
++                Mot de passe oublié
++              </a>
++            </div>
++          </form>
++        </div>
++
++        {/* Register redirect */}
++        <div className="w-full max-w-md flex flex-col items-center mt-6 space-y-2">
++          <p className="text-sm font-medium text-gray-700">
++            Je n'ai pas de compte, je m'inscris
++          </p>
++          <Button text="S'inscrire" variant="beige" onClick={() => navigate('/register')} />
++        </div>
+       </div>
+     </div>
+   );
+-};
++};
+\ No newline at end of file
+diff --git a/src/pages/profile/ProfilePage.tsx b/src/pages/profile/ProfilePage.tsx
+index ec75e9a..8719e2f 100644
+--- a/src/pages/profile/ProfilePage.tsx
++++ b/src/pages/profile/ProfilePage.tsx
+@@ -1,110 +1,79 @@
++// src/pages/profile/ProfilePage.tsx
+ import { useEffect, useState } from "react";
+-import { SlArrowRightCircle } from "react-icons/sl";
+ import { useNavigate } from "react-router-dom";
+-import { ProfileFormData } from "../../types/Profile"; // Adjust the import path as necessary
++import PageLayout from "@components/layout/PageLayout";
++import { SlArrowRightCircle } from "react-icons/sl";
++import { ProfileFormData } from "../../types/Profile";
++
+ export default function ProfilePage() {
+   const navigate = useNavigate();
+   const [profile, setProfile] = useState<ProfileFormData | null>(null);
+-  const [loading, setLoading] = useState(true); // Loading state to manage the fetch operation
+-  const [error, setError] = useState(""); // Error state to handle any errors during the fetch operation
++  const [loading, setLoading] = useState(true);
++  const [error, setError] = useState("");
+ 
+   useEffect(() => {
+     const fetchProfile = async () => {
+       try {
+-        const response = await fetch("http://localhost:3000/profile", {
+-          headers: {
+-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming you store the JWT token in localStorage
+-          },
++        const res = await fetch("http://localhost:3000/profile", {
++          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+         });
+-
+-        if (!response.ok) {
+-          navigate("/login");
+-          return;
+-        } // If the response is not ok, redirect to login
+-
+-        const data = await response.json();
+-        setProfile(data); // Set the profile data from the response
+-      } catch (err: any) {
+-        setError(err.message || "Erreur inconnue"); // Set the error message if the fetch fails
++        if (!res.ok) return navigate("/login");
++        const data = await res.json();
++        setProfile(data);
++      } catch (e: any) {
++        setError(e.message || "Erreur inconnue");
+       } finally {
+-        setLoading(false); // Set loading to false after the fetch operation completes
++        setLoading(false);
+       }
+     };
++    fetchProfile();
++  }, [navigate]);
+ 
+-    fetchProfile(); // Call the fetchProfile function to get the profile data
+-  }, []);
+-
+-  if (loading) return <p className="text-center mt-4">Chargement...</p>;
+-  if (error) return <p className="text-center text-red-600 mt-4">{error}</p>;
++  if (loading) return <p className="text-center mt-4">Chargement…</p>;
++  if (error)   return <p className="text-center text-red-600 mt-4">{error}</p>;
+ 
+   return (
+-    <div className="w-full max-w-md mx-auto pt-2 px-4 pb-4 mt-0 ">
+-      {/* Header */}
+-      <div className="bg-gray-600 text-white p-3 rounded-t m-3 text-center">
+-        <h1 className="text-xl font-bold">Mon profil</h1>
+-      </div>
++    <PageLayout>
++      <>
++        {/* Header */}
++        <div className="bg-[#376cad] text-white p-4 text-center">
++          <h1 className="text-xl font-bold">Mon profil</h1>
++        </div>
+ 
+-      {/* Identité */}
+-      <div className="border-b-2 p-4 flex justify-between items-center">
+-        <div>
+-          <h2 className="text-lg font-semibold mb-2 ">Identité</h2>
+-          <p className="mb-2">
+-            <strong>Nom : </strong> {profile?.identity?.last_name}
+-          </p>
+-          <p className="mb-2">
+-            <strong>Prénom : </strong> {profile?.identity?.first_name}
+-          </p>
+-          <p className="mb-2">
+-            <strong>Email : </strong> {profile?.email}
+-          </p>
++        {/* Identité */}
++        <div className="border-b-2 p-4 pt-8 flex justify-between items-center">
++          <div>
++            <h2 className="text-lg font-semibold mb-2">Identité</h2>
++            <p className="mb-2"><strong>Nom : </strong>{profile?.identity?.last_name}</p>
++            <p className="mb-2"><strong>Prénom : </strong>{profile?.identity?.first_name}</p>
++            <p className="mb-2"><strong>Email : </strong>{profile?.email}</p>
++          </div>
++          <button onClick={() => navigate("/identity")} className="text-4xl">
++            <SlArrowRightCircle />
++          </button>
+         </div>
+-        <button onClick={() => navigate("/identity")} className="text-4xl">
+-          <SlArrowRightCircle />
+-        </button>
+-      </div>
+ 
+-      {/* À propos de moi */}
+-      <div className="border-b-2 p-4 mt-4">
+-        <h2 className="text-lg font-semibold mb-2">À propos de moi</h2>
+-        <p className="bg-gray-100 p-2 rounded text-sm whitespace-pre-wrap">
+-          {profile?.identity?.about_me || "Aucune description fournie."}
+-        </p>
+-      </div>
++        {/* À propos de moi */}
++        <div className="border-b-2 p-4 mt-4">
++          <h2 className="text-lg font-semibold mb-2">À propos de moi</h2>
++          <p className="bg-gray-100 p-2 rounded text-sm whitespace-pre-wrap">
++            {profile?.identity?.about_me || "Aucune description fournie."}
++          </p>
++        </div>
+ 
+-      {/* Progress Bar */}
+-      <div className="mt-4 bg-gray-400 h-3 rounded">
+-        <div className="bg-[#F5EEDC] h-3 rounded w-[60%]"></div>
+-      </div>
++        {/* Progress */}
++        <div className="mt-4 bg-gray-400 h-3 rounded">
++          <div className="bg-[#F5EEDC] h-3 rounded w-[60%]" />
++        </div>
+ 
+-      {/* Buttons */}
+-      <div className="flex flex-col gap-2 mt-4">
+-        <button
+-          onClick={() => navigate("/educations")}
+-          className="bg-[#F5EEDC] p-2 rounded"
+-        >
+-          Formations
+-        </button>
+-        
+-        <button
+-          onClick={() => navigate("/experiences")}
+-          className="bg-[#F5EEDC] p-2 rounded"
+-        >
+-          Expériences professionnelles
+-        </button>
+-        <button
+-          onClick={() => navigate("/skills")}
+-          className="bg-[#F5EEDC] p-2 rounded"
+-        >
+-          Compétences
+-        </button>
+-        <button
+-          onClick={() => navigate("/languages")}
+-          className="bg-[#F5EEDC] p-2 rounded"
+-        >
+-          Langues
+-        </button>
+-        
+-      </div>
+-    </div>
++        {/* Links */}
++        <div className="flex flex-col gap-2 mt-4">
++          <button onClick={() => navigate("/educationS")} className="bg-[#F5EEDC] p-2 rounded">Formations</button>
++          <button onClick={() => navigate("/experiences")} className="bg-[#F5EEDC] p-2 rounded">Expériences professionnelles</button>
++          <button onClick={() => navigate("/skills")} className="bg-[#F5EEDC] p-2 rounded">Compétences</button>
++          <button onClick={() => navigate("/languages")} className="bg-[#F5EEDC] p-2 rounded">Langues</button>
++        </div>
++      </>
++    </PageLayout>
+   );
+ }
+diff --git a/src/pages/skillListPage/SkillListPage.tsx b/src/pages/skillListPage/SkillListPage.tsx
+index f4dd899..c175e4d 100644
+--- a/src/pages/skillListPage/SkillListPage.tsx
++++ b/src/pages/skillListPage/SkillListPage.tsx
+@@ -5,6 +5,8 @@ import Button from "@components/ui/globals/Button";
+ import { useState } from "react";
+ import { SkillEditRow } from "../../components/skill/SkillEditRow";
+ import { LevelCategory } from "../../types/Level";
++import { AiOutlinePlus } from "react-icons/ai";
++import PageLayout from "@components/layout/PageLayout";
+ 
+ export const SkillListPage = () => {
+   const {
+@@ -41,16 +43,18 @@ export const SkillListPage = () => {
+       </div>
+     );
+   }
++  
+ 
+   return (
+-    <div className="w-full min-h-screen px-2.5 py-10 flex flex-col items-start justify-start">
+-      <div className="w-full">
+-        <div className="flex items-center justify-between mb-2">
+-          <Header title="Compétences" description="" />
++   <PageLayout>
++    <>
++            <div className="w-full">
++        <div className="bg-[#376cad] text-white p-3 rounded-t m-3 flex justify-between items-center">
++        <h2 className="text-xl font-semibold">Compétences</h2>
+ 
+           {/* Add button: opens inline row for a new skill */}
+           <div className="ml-4 self-center">
+-            <Button
++            <button
+               onClick={() => {
+                 // Open an empty edit row for NEW item
+                 setEditingSkill({
+@@ -59,11 +63,12 @@ export const SkillListPage = () => {
+                   level: "1" as LevelCategory,
+                 });
+               }}
+-              variant="beige"
+-              icon={true}
+-              size="lg"
+-              borderRadius="full"
+-            />
++                          className="bg-[#f5dab4] hover:bg-[#d9c9a1] p-2 rounded-full"
++
++              >            
++              <AiOutlinePlus size={22} />
++            
++              </button>
+           </div>
+         </div>
+ 
+@@ -191,6 +196,7 @@ export const SkillListPage = () => {
+           )}
+         </div>
+       </div>
+-    </div>
++    </>
++    </PageLayout>
+   );
+ };
+diff --git a/src/pages/skillListPage/SkillListViewModel.tsx b/src/pages/skillListPage/SkillListViewModel.tsx
+index b5e2ab2..c705a95 100644
+--- a/src/pages/skillListPage/SkillListViewModel.tsx
++++ b/src/pages/skillListPage/SkillListViewModel.tsx
+@@ -1,39 +1,39 @@
+ // src/viewModels/SkillListViewModel.ts
+-import { useEffect, useState } from 'react';
+-import { useApi } from '@hooks/useApi';
+-import { skillService } from '../../services/skillService';
+-import { SkillPayload, starsToLevel , LevelCategoryName} from '../../types/Skill';
+-import { LevelCategory } from '../../types/Level';
++import { useEffect, useState } from "react";
++import { useApi } from "@hooks/useApi";
++import { skillService } from "../../services/skillService";
++import { SkillPayload } from "../../types/Skill";
++import { LevelCategory } from "../../types/Level";
+ 
+ type UISkill = { id: number; name: string; level: LevelCategory };
+ 
+ export const SkillListViewModel = () => {
+   const api = useApi();
+ 
++  // data
+   const [skill, setSkill] = useState<UISkill[]>([]);
+   const [isLoading, setIsLoading] = useState(false);
+   const [error, setError] = useState<string | null>(null);
+ 
+-  // NOTE: modal states kept for future use, but we work inline for now
++  // (optional) legacy modal states kept for compatibility
+   const [isModalOpen, setIsModalOpen] = useState(false);
+   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+-
+-  // form state (kept for modal compatibility)
+   const [editingId, setEditingId] = useState<number | null>(null);
+-  const [formName, setFormName] = useState('');
+-  const [formStars, setFormStars] = useState(1);
+-
+-  // delete
++  const [formName, setFormName] = useState("");
++  const [formStars, setFormStars] = useState<1 | 2 | 3 | 4>(1);
+   const [skillToDelete, setSkillToDelete] = useState<number | null>(null);
+ 
+-  const normalize = (data: Array<{ id: number; name: string; level: string }>): UISkill[] =>
+-    data.map(d => ({
++  // normalize server data to UI type
++  const normalize = (
++    data: Array<{ id: number; name: string; level: string }>
++  ): UISkill[] =>
++    data.map((d) => ({
+       id: d.id,
+       name: d.name,
+-      // backend might send string enums (BEGINNER/1 etc.). Ensure LevelCategory type.
+-      level: d.level as LevelCategory,
++      level: (d.level as LevelCategory) ?? "1",
+     }));
+ 
++  // load list
+   const loadSkills = async () => {
+     setIsLoading(true);
+     setError(null);
+@@ -41,87 +41,93 @@ export const SkillListViewModel = () => {
+       const data = await skillService.getSkill(api);
+       setSkill(normalize(data));
+     } catch (e) {
+-      console.error('Failed to load skills:', e);
+-      setError('Failed to load skills');
++      console.error("Failed to load skills:", e);
++      setError("Failed to load skills");
+     } finally {
+       setIsLoading(false);
+     }
+   };
+ 
+-  useEffect(() => { loadSkills(); }, []);
++  useEffect(() => {
++    loadSkills();
++  }, []);
+ 
+-  // ---- CREATE (inline optimistic) ----
++  // ---- CREATE (optimistic) ----
+   const handleAddSkill = async (skillData: {
+     created_At: Date;
+     profile_id: number;
+-    id: number;                 // temp id from UI
++    id: number; // temp UI id
+     name: string;
+-    level: LevelCategory;
++    level: LevelCategory; // "1" | "2" | "3" | "4"
+   }) => {
+-    // 1) Optimistically append so user sees it immediately (under the old list)
+-    // NOTE: we keep the temp id until server returns; then we reload to sync.
+-    setSkill(prev => [...prev, { id: skillData.id, name: skillData.name, level: skillData.level }]);
++    // optimistic append
++    setSkill((prev) => [
++      ...prev,
++      { id: skillData.id, name: skillData.name, level: skillData.level },
++    ]);
+ 
+     try {
+-      const payload: SkillPayload = { name: skillData.name.trim(), level: starsToLevel(Number(skillData.level)) };
++      const payload: SkillPayload = {
++        id: 0,
++        name: skillData.name.trim(),
++        level: skillData.level, // send as-is
++      };
+       await skillService.createSkill(payload, api);
+-      // 2) Re-sync with server to get real id/order
++      // re-sync to get real ids
+       await loadSkills();
+     } catch (e: any) {
+-      console.error('Create failed:', e?.response?.data || e);
+-      setError('Failed to create skill');
+-      // Revert optimistic append on error
+-      setSkill(prev => prev.filter(s => s.id !== skillData.id));
++      console.error("Create failed:", e?.response?.data || e);
++      setError("Failed to create skill");
++      // rollback optimistic append
++      setSkill((prev) => prev.filter((s) => s.id !== skillData.id));
+     }
+   };
+ 
+-  // ---- EDIT (by object) ----
+-const handleUpdateSkill = async (
+-  id: number,
+-  s: { id: number; name: string; level: LevelCategory }
+-) => {
+-  // Convert UI level ("1" | "2" | "3" | "4") -> backend enum name
+-  const payload: SkillPayload = {
+-    name: (s.name ?? '').trim(),             // ✅ was: skillData.name
+-    level: starsToLevel(Number(s.level)),     // ✅ was: skillData.level (or s.level directly)
+-  };
+-
+-  // Optimistic UI: update in-place
+-  setSkill(prev => prev.map(item => (item.id === id ? { ...item, ...s } : item)));
+-
+-  try {
+-    await skillService.updateSkill(id, payload, api);
+-    // If needed to re-sync from server:
+-    // await loadSkills();
+-  } catch (e: any) {
+-    console.error('Update failed:', e?.response?.data || e);
+-    setError('Failed to save skill');
+-    await loadSkills(); // rollback to server truth
+-  }
+-};
++  // ---- UPDATE (by object, optimistic) ----
++  const handleUpdateSkill = async (
++    id: number,
++    s: { id: number; name: string; level: LevelCategory }
++  ) => {
++    // optimistic update
++    const snapshot = [...skill];
++    setSkill((prev) => prev.map((it) => (it.id === id ? { ...it, ...s } : it)));
+ 
++    try {
++      const payload: SkillPayload = {
++        id: 0,
++        name: (s.name ?? "").trim(),
++        level: s.level, // send as-is
++      };
++      await skillService.updateSkill(id, payload, api);
++      // if you prefer full re-sync: await loadSkills();
++    } catch (e: any) {
++      console.error("Update failed:", e?.response?.data || e);
++      setError("Failed to save skill");
++      // rollback on error
++      setSkill(snapshot);
++    }
++  };
+ 
+-  // ---- DELETE (immediate) ----
++  // ---- DELETE (optimistic) ----
+   const deleteSkillNow = async (id: number) => {
+-    // Optimistic remove for snappy UI
+-    const snapshot = skill;
+-    setSkill(prev => prev.filter(s => s.id !== id));
++    const snapshot = [...skill];
++    setSkill((prev) => prev.filter((s) => s.id !== id));
+     try {
+       await skillService.deleteSkill(id, api);
+     } catch (e) {
+-      console.error('Failed to delete skill:', e);
+-      setError('Failed to delete skill');
+-      // rollback on error
++      console.error("Failed to delete skill:", e);
++      setError("Failed to delete skill");
+       setSkill(snapshot);
+     }
+   };
+ 
+-  // Legacy modal flows kept for compatibility (not used in current page)
++  // (optional) legacy modal helpers
+   const openEdit = (s: { id: number; name: string; level: string }) => {
+     setEditingId(s.id);
+     setFormName(s.name);
+-    const map: Record<string, number> = { BEGINNER: 1, INTERMEDIATE: 2, ADVANCED: 3, EXPERT: 4 };
+-    setFormStars(map[s.level] ?? 1);
++    // map string level "1" | "2" | "3" | "4" to numeric stars
++    const num = (Number(s.level) || 1) as 1 | 2 | 3 | 4;
++    setFormStars(num);
+     setIsModalOpen(true);
+   };
+ 
+@@ -139,17 +145,27 @@ const handleUpdateSkill = async (
+ 
+   return {
+     // data
+-    skill, isLoading, error,
++    skill,
++    isLoading,
++    error,
+ 
+-    // inline create/update/delete
++    // actions
+     handleAddSkill,
+     handleUpdateSkill,
+     deleteSkillNow,
+ 
+-    // (optional) modal states & helpers, kept if you use a modal elsewhere
+-    isModalOpen, setIsModalOpen,
+-    isDeleteModalOpen, setIsDeleteModalOpen,
+-    editingId, formName, setFormName, formStars, setFormStars,
+-    openEdit, handleDeleteClick, handleConfirmDelete,
++    // optional modal states & helpers
++    isModalOpen,
++    setIsModalOpen,
++    isDeleteModalOpen,
++    setIsDeleteModalOpen,
++    editingId,
++    formName,
++    setFormName,
++    formStars,
++    setFormStars,
++    openEdit,
++    handleDeleteClick,
++    handleConfirmDelete,
+   };
+ };
+diff --git a/src/pages/welcome/WelcomePage.tsx b/src/pages/welcome/WelcomePage.tsx
+index eb11e3a..ea2e257 100644
+--- a/src/pages/welcome/WelcomePage.tsx
++++ b/src/pages/welcome/WelcomePage.tsx
+@@ -1,28 +1,28 @@
+-import React from 'react';
+ 
+ import { useNavigate } from "react-router-dom";
+ 
+ export default function WelcomePage() {
+  const navigate = useNavigate();
+ 
+-  return (
+-    <div className="pt-24 pb-16 flex flex-col items-center px-4 min-h-screen ">
+-      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
+-        <h1 className="font-bold text-3xl mb-6 align-center">
+-          Bienvenue sur MyCV, 
+-         </h1>
+-         <p className="mb-6 text-3xl "> Première connexion, veuillez renseigner votre profil.</p>
+-       
+-        
+-      </div>
+-      
+-      <div className="mt-6">
++ return (
++    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
++      <div className="bg-white shadow-md rounded-xl p-8 text-center max-w-md">
++        <h1 className="text-3xl font-bold text-blue-600 mb-4">
++          Bienvenue sur MyCV 👋
++        </h1>
++        <p className="text-gray-600 mb-6">
++          Première connexion ? Complétez votre profil afin de créer votre CV et
++          postuler aux offres facilement.
++        </p>
+         <button
+           onClick={() => navigate("/profile")}
+-          className="bg-[#f5eedc] hover:text-gray-700 text-black font-bold py-2 px-4 rounded"
++          className="bg-[#f5eedc] hover:text-gray-700 text-black font-bold py-2 px-6 rounded-lg transition"
+         >
+           Commencer
+         </button>
++         <p className="mt-4 text-sm text-gray-500">
++          Vous pourrez explorer les offres plus tard.
++        </p>
+     </div>
+     </div>
+   );
+diff --git a/src/services/cvService.ts b/src/services/cvService.ts
+deleted file mode 100644
+index bd5180b..0000000
+--- a/src/services/cvService.ts
++++ /dev/null
+@@ -1,36 +0,0 @@
+-import { Cv } from "../../src/types/cv";
+-import { useApi } from "../hooks/useApi"; 
+-
+-// --- Base URL for CV endpoints ---
+-const BASE_URL = "/cvs";
+-
+-export const cvService = {
+-  // Get all CVs for the logged-in profile
+-  async getAll(api: ReturnType<typeof useApi>): Promise<Cv[]> {
+-    const res = await api.get<Cv[]>(BASE_URL);
+-    return res.data;
+-  },
+-
+-  // Get one CV by id
+-  async getById(api: ReturnType<typeof useApi>, id: number): Promise<Cv> {
+-    const res = await api.get<Cv>(`${BASE_URL}/${id}`);
+-    return res.data;
+-  },
+-
+-  // Create a new CV
+-  async create(api: ReturnType<typeof useApi>, payload: Partial<Cv>): Promise<Cv> {
+-    const res = await api.post<Cv>(BASE_URL, payload);
+-    return res.data;
+-  },
+-
+-  // Update an existing CV
+-  async update(api: ReturnType<typeof useApi>, id: number, payload: Partial<Cv>): Promise<Cv> {
+-    const res = await api.put<Cv>(`${BASE_URL}/${id}`, payload);
+-    return res.data;
+-  },
+-
+-  // Delete CV
+-  async remove(api: ReturnType<typeof useApi>, id: number): Promise<void> {
+-    await api.delete(`${BASE_URL}/${id}`);
+-  },
+-};
+diff --git a/src/types/Cv.ts b/src/types/Cv.ts
+deleted file mode 100644
+index 3c8798f..0000000
+--- a/src/types/Cv.ts
++++ /dev/null
+@@ -1,49 +0,0 @@
+-// --- Basic CV type (matches Prisma Cv model but simplified for frontend) ---
+-export type Cv = {
+-  id: number;
+-  numero?: number;
+-  title?: string;
+-  created_at?: string;   // we use string for dates in frontend
+-  updated_at?: string;
+-  template_id: number;
+-  cvidentitydisplaychoices_id: number;
+-  identity_id: number;
+-  profile_id: number;
+-};
+-
+-// --- Relation types ---
+-export type CvEducationChoice = {
+-  cv_id: number;
+-  education_id: number;
+-  created_at?: string;
+-};
+-
+-export type CvExperienceChoice = {
+-  cv_id: number;
+-  experience_id: number;
+-  created_at?: string;
+-};
+-
+-export type CvLanguageChoice = {
+-  cv_id: number;
+-  languages_id: number;
+-  created_at?: string;
+-};
+-
+-export type CvSkillChoice = {
+-  cv_id: number;
+-  skills_id: number;
+-  created_at?: string;
+-};
+-
+-// --- Display choices for Identity ---
+-export type Cvidentitydisplaychoice = {
+-  id: number;
+-  birth_date?: boolean;
+-  phone_number?: boolean;
+-  street?: boolean;
+-  zip_code?: boolean;
+-  city?: boolean;
+-  about_me?: boolean;
+-  created_at?: string;
+-};
+diff --git a/src/types/Skill.ts b/src/types/Skill.ts
+index e4a74a6..9eebfb7 100644
+--- a/src/types/Skill.ts
++++ b/src/types/Skill.ts
+@@ -1,9 +1,11 @@
+ // Only the 2 fields we actually send
+ export type LevelCategoryName = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT';
++export type LevelCategory = "1" | "2" | "3" | "4";
+ 
+ export interface SkillPayload {
++  id: number;
+   name: string;
+-  level: LevelCategoryName;
++  level: LevelCategory;
+ }
+ 
+ // Helper to map stars (1..4) to backend enum text
+diff --git a/src/types/education.ts b/src/types/education.ts
+index f92a7ea..e71ef5f 100644
+--- a/src/types/education.ts
++++ b/src/types/education.ts
+@@ -4,6 +4,7 @@ export interface educationFormData {
+     status: string;
+     level: string;
+     graduation_date: string;
++    
+ }
+ export interface schoolFormData {
+     id: number;
+diff --git a/src/types/interview.ts b/src/types/interview.ts
+new file mode 100644
+index 0000000..36d0353
+--- /dev/null
++++ b/src/types/interview.ts
+@@ -0,0 +1,13 @@
++export type InterviewStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'NO_RESPONSE';
++export type InterviewMode   = 'IN_PERSON' | 'ONLINE' | 'TELEPHONE';
++
++export interface InterviewFormData {
++  id: number;
++  position: string | null;
++  company?: string | null;
++  status?: InterviewStatus | null;
++  date_interview?: string | null;      // ISO أو "YYYY-MM-DD"
++  is_closed?: boolean | null;          // ← بدال Boolean
++  location_of_interview?: string | null;
++  interview_mode?: InterviewMode | null;
++}
