@@ -7,7 +7,7 @@ A modern CV Management web application built with React and TypeScript.
 - React
 - TypeScript
 - Vite
-- Material UI
+- Tailwind CSS
 - React Router
 - Axios
 
